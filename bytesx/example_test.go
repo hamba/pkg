@@ -18,5 +18,5 @@ func ExampleBuffer() {
 
 	p.Put(buf) // Release the buffer back to the pool
 
-	// Output: Hello world!
+	// Output: Hello World!
 }
