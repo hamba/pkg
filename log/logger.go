@@ -63,6 +63,10 @@ func Error(ctx context.Context, msg string, pairs ...interface{}) {
 	})
 }
 
+type exitFunc func(int)
+
+var exit exitFunc = os.Exit
+
 // Fatal is equivalent to Error() followed by a call to os.Exit(1).
 //
 // Fatal will attempt to call Close() on the logger.
@@ -71,11 +75,11 @@ func Fatal(ctx context.Context, msg interface{}, pairs ...interface{}) {
 		l.Error(fmt.Sprintf("%+v", msg), pairs...)
 
 		if cl, ok := l.(io.Closer); ok {
-			cl.Close()
+			_ = cl.Close()
 		}
 	})
 
-	os.Exit(1)
+	exit(1)
 }
 
 func withLogger(ctx context.Context, fn func(l Logger)) {

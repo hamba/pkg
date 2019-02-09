@@ -2,7 +2,6 @@ package stats
 
 import (
 	"context"
-	"time"
 
 	"github.com/hamba/pkg/timex"
 )
@@ -16,7 +15,7 @@ type Timer interface {
 }
 
 type timer struct {
-	start int64
+	start timex.Nanotime
 	ctx   context.Context
 	name  string
 	rate  float32
@@ -31,9 +30,9 @@ func Time(ctx context.Context, name string, rate float32, tags ...interface{}) T
 }
 
 func (t *timer) Start() {
-	t.start = timex.Nanotime()
+	t.start = timex.Now()
 }
 
 func (t *timer) Done() {
-	Timing(t.ctx, t.name, time.Duration(timex.Nanotime()-t.start), t.rate, t.tags...)
+	Timing(t.ctx, t.name, timex.Since(t.start), t.rate, t.tags...)
 }
