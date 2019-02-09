@@ -9,7 +9,7 @@ import (
 func ExampleBuffer() {
 	p := bytesx.NewPool(1024) // A Buffer is returned from a pool
 
-	 buf := p.Get() // Buffer is Reset when getting it
+	buf := p.Get() // Buffer is Reset when getting it
 
 	buf.WriteString("Hello")
 	buf.Write([]byte(" World!"))
