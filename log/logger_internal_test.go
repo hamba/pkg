@@ -51,7 +51,7 @@ func TestFatal(t *testing.T) {
 
 	m := new(MockLogger)
 	m.On("Error", "test log", []interface{}{"foo", "bar"})
-	m.On("Close", ).Return(nil)
+	m.On("Close").Return(nil)
 	ctx := WithLogger(context.Background(), m)
 
 	Fatal(ctx, "test log", "foo", "bar")
