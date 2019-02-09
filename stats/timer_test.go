@@ -1,7 +1,6 @@
 package stats_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/hamba/pkg/stats"
@@ -11,9 +10,9 @@ import (
 func TestTimer(t *testing.T) {
 	m := new(MockStats)
 	m.On("Timing", "test", mock.Anything, float32(1.0), mock.Anything).Return(nil)
+	sable := &testStatable{s: m}
 
-	ctx := stats.WithStatter(context.Background(), m)
-	ti := stats.Time(ctx, "test", 1.0)
+	ti := stats.Time(sable, "test", 1.0)
 	ti.Done()
 
 	m.AssertExpectations(t)

@@ -1,8 +1,6 @@
 package stats_test
 
 import (
-	"context"
-
 	"github.com/hamba/pkg/stats"
 )
 
@@ -18,25 +16,21 @@ func ExampleTaggedStatter() {
 }
 
 func ExampleGroup() {
-	var stat stats.Statter
+	var statable stats.Statable
 	// Set your Statter implementation
 
-	ctx := stats.WithStatter(context.Background(), stat)
-
-	stats.Group(ctx, "prefix", func(s stats.Statter) {
-		stat.Inc("test", 1, 1.0, "tag", "foobar")
+	stats.Group(statable, "prefix", func(s stats.Statter) {
+		s.Inc("test", 1, 1.0, "tag", "foobar")
 	})
 
 	// Output name: "prefix.test"
 }
 
 func ExampleTime() {
-	var stat stats.Statter
+	var statable stats.Statable
 	// Set your Statter implementation
 
-	ctx := stats.WithStatter(context.Background(), stat)
-
-	timer := stats.Time(ctx, "latency", 1.0, "tag", "foobar")
+	timer := stats.Time(statable, "latency", 1.0, "tag", "foobar")
 
 	// Do something
 

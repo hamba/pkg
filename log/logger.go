@@ -1,7 +1,6 @@
 package log
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"os"
@@ -17,6 +16,10 @@ var (
 	// Null is the null Logger instance.
 	Null = &nullLogger{}
 )
+// Loggable represents an object that has a Logger.
+type Loggable interface {
+	Logger() Logger
+}
 
 // Logger represents an abstract logging object.
 type Logger interface {
@@ -28,39 +31,19 @@ type Logger interface {
 	Error(msg string, ctx ...interface{})
 }
 
-// WithLogger sets Logger in the context.
-func WithLogger(ctx context.Context, logger Logger) context.Context {
-	if logger == nil {
-		logger = Null
-	}
-	return context.WithValue(ctx, ctxKey, logger)
-}
-
-// FromContext returns the instance Logger in the context.
-func FromContext(ctx context.Context) (Logger, bool) {
-	stats, ok := ctx.Value(ctxKey).(Logger)
-	return stats, ok
-}
-
 // Debug logs a debug message.
-func Debug(ctx context.Context, msg string, pairs ...interface{}) {
-	withLogger(ctx, func(l Logger) {
-		l.Debug(msg, pairs...)
-	})
+func Debug(lable Loggable, msg string, pairs ...interface{}) {
+	lable.Logger().Debug(msg, pairs...)
 }
 
 // Info logs an informational message.
-func Info(ctx context.Context, msg string, pairs ...interface{}) {
-	withLogger(ctx, func(l Logger) {
-		l.Info(msg, pairs...)
-	})
+func Info(lable Loggable, msg string, pairs ...interface{}) {
+	lable.Logger().Info(msg, pairs...)
 }
 
 // Error logs an error message.
-func Error(ctx context.Context, msg string, pairs ...interface{}) {
-	withLogger(ctx, func(l Logger) {
-		l.Error(msg, pairs...)
-	})
+func Error(lable Loggable, msg string, pairs ...interface{}) {
+	lable.Logger().Error(msg, pairs...)
 }
 
 type exitFunc func(int)
@@ -70,25 +53,14 @@ var exit exitFunc = os.Exit
 // Fatal is equivalent to Error() followed by a call to os.Exit(1).
 //
 // Fatal will attempt to call Close() on the logger.
-func Fatal(ctx context.Context, msg interface{}, pairs ...interface{}) {
-	withLogger(ctx, func(l Logger) {
-		l.Error(fmt.Sprintf("%+v", msg), pairs...)
-
-		if cl, ok := l.(io.Closer); ok {
-			_ = cl.Close()
-		}
-	})
-
-	exit(1)
-}
-
-func withLogger(ctx context.Context, fn func(l Logger)) {
-	if l, ok := FromContext(ctx); ok {
-		fn(l)
-		return
+func Fatal(lable Loggable, msg interface{}, pairs ...interface{}) {
+	l := lable.Logger()
+	l.Error(fmt.Sprintf("%+v", msg), pairs...)
+	if cl, ok := l.(io.Closer); ok {
+		_ = cl.Close()
 	}
 
-	fn(Null)
+	exit(1)
 }
 
 type nullLogger struct{}

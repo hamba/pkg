@@ -1,8 +1,6 @@
 package stats
 
 import (
-	"context"
-
 	"github.com/hamba/pkg/timex"
 )
 
@@ -15,16 +13,16 @@ type Timer interface {
 }
 
 type timer struct {
+	sable Statable
 	start timex.Nanotime
-	ctx   context.Context
 	name  string
 	rate  float32
 	tags  []interface{}
 }
 
 // Time is a shorthand for Timing.
-func Time(ctx context.Context, name string, rate float32, tags ...interface{}) Timer {
-	t := &timer{ctx: ctx, name: name, rate: rate, tags: tags}
+func Time(sable Statable, name string, rate float32, tags ...interface{}) Timer {
+	t := &timer{sable: sable, name: name, rate: rate, tags: tags}
 	t.Start()
 	return t
 }
@@ -34,5 +32,5 @@ func (t *timer) Start() {
 }
 
 func (t *timer) Done() {
-	Timing(t.ctx, t.name, timex.Since(t.start), t.rate, t.tags...)
+	Timing(t.sable, t.name, timex.Since(t.start), t.rate, t.tags...)
 }

@@ -3,8 +3,17 @@ package stats_test
 import (
 	"time"
 
+	"github.com/hamba/pkg/stats"
 	"github.com/stretchr/testify/mock"
 )
+
+type testStatable struct {
+	s stats.Statter
+}
+
+func (s *testStatable) Statter() stats.Statter {
+	return s.s
+}
 
 type MockStats struct {
 	mock.Mock

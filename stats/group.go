@@ -1,7 +1,6 @@
 package stats
 
 import (
-	"context"
 	"time"
 )
 
@@ -31,14 +30,15 @@ func (g group) Close() error {
 }
 
 // Group adds a common prefix to a set of stats.
-func Group(ctx context.Context, prefix string, fn func(s Statter)) {
-	withStatter(ctx, func(s Statter) {
-		if prefix != "" {
-			prefix += "."
-		}
+func Group(sable Statable, prefix string, fn func(s Statter)) {
+	if prefix != "" {
+		prefix += "."
+	}
 
-		grp := group{s: s, prefix: prefix}
+	grp := group{
+		s:      sable.Statter(),
+		prefix: prefix,
+	}
 
-		fn(grp)
-	})
+	fn(grp)
 }

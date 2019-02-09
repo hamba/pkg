@@ -1,46 +1,11 @@
 package log
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
-
-func TestWithLogger(t *testing.T) {
-	ctx := WithLogger(context.Background(), Null)
-
-	got := ctx.Value(ctxKey)
-
-	assert.Equal(t, Null, got)
-}
-
-func TestWithLogger_NilLogger(t *testing.T) {
-	ctx := WithLogger(context.Background(), nil)
-
-	got := ctx.Value(ctxKey)
-
-	assert.Equal(t, Null, got)
-}
-
-func TestFromContext(t *testing.T) {
-	ctx := context.WithValue(context.Background(), ctxKey, Null)
-
-	got, ok := FromContext(ctx)
-
-	assert.True(t, ok)
-	assert.Equal(t, Null, got)
-}
-
-func TestFromContext_NotSet(t *testing.T) {
-	ctx := context.Background()
-
-	got, ok := FromContext(ctx)
-
-	assert.False(t, ok)
-	assert.Nil(t, got)
-}
 
 func TestFatal(t *testing.T) {
 	// Switch out the exit func
@@ -52,27 +17,20 @@ func TestFatal(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Error", "test log", []interface{}{"foo", "bar"})
 	m.On("Close").Return(nil)
-	ctx := WithLogger(context.Background(), m)
+	labl := &testLoggable{l: m}
 
-	Fatal(ctx, "test log", "foo", "bar")
+	Fatal(labl, "test log", "foo", "bar")
 
 	m.AssertExpectations(t)
 	assert.Equal(t, 1, calledCode)
 }
 
-func TestWithLoggerFunc(t *testing.T) {
-	tests := []struct {
-		ctx    context.Context
-		expect Logger
-	}{
-		{context.Background(), Null},
-	}
+type testLoggable struct {
+	l Logger
+}
 
-	for _, tt := range tests {
-		withLogger(tt.ctx, func(l Logger) {
-			assert.Equal(t, tt.expect, l)
-		})
-	}
+func (l *testLoggable) Logger() Logger {
+	return l.l
 }
 
 type MockLogger struct {
