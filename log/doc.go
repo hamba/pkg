@@ -17,5 +17,5 @@ A Logger can be attached, retrieved and used from a Context:
 
 	log.Info("message", "context", "info")
 
- */
+*/
 package log

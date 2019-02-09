@@ -17,5 +17,5 @@ A Statter can be attached, retrieved and used from a Context:
 
 	stat.Inc("test", 1, 1.0, "tag", "foobar")
 
- */
+*/
 package stats

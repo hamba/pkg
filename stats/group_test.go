@@ -18,7 +18,6 @@ func TestGroup_Inc(t *testing.T) {
 		s.Inc("test", 1, 1.0, "foo", "bar")
 	})
 
-
 	m.AssertExpectations(t)
 }
 
