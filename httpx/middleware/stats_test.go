@@ -36,7 +36,7 @@ func TestWithRequestStats(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := new(MockStats)
 			s.On("Inc", "request.start", int64(1), float32(1.0), tt.wantTags)
-			s.On("Timing", "response.time", mock.Anything, float32(1.0), tt.wantTags)
+			s.On("Timing", "request.time", mock.Anything, float32(1.0), tt.wantTags)
 			s.On("Inc", "request.complete", int64(1), float32(1.0), mock.Anything)
 
 			m := middleware.WithRequestStats(http.HandlerFunc(

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/hamba/pkg/httpx"
 	"github.com/hamba/pkg/httpx/httptest"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +16,7 @@ func TestServer_HandlesExpectation(t *testing.T) {
 
 	s.On("GET", "/test/path")
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 }
@@ -28,7 +27,7 @@ func TestServer_HandlesAnythingMethodExpectation(t *testing.T) {
 
 	s.On(httptest.Anything, "/test/path")
 
-	res, err := httpx.DefaultClient.Post(s.URL()+"/test/path", "text/plain", bytes.NewReader([]byte{}))
+	res, err := http.Post(s.URL()+"/test/path", "text/plain", bytes.NewReader([]byte{}))
 	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 }
@@ -39,7 +38,7 @@ func TestServer_HandlesAnythingPathExpectation(t *testing.T) {
 
 	s.On("GET", httptest.Anything)
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 }
@@ -50,7 +49,7 @@ func TestServer_HandlesWildcardPathExpectation(t *testing.T) {
 
 	s.On("GET", "/test/*")
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 }
@@ -69,7 +68,7 @@ func TestServer_HandlesUnexpectedMethodRequest(t *testing.T) {
 
 	s.On("POST", "/")
 
-	httpx.DefaultClient.Get(s.URL() + "/test/path")
+	http.Get(s.URL() + "/test/path")
 }
 
 func TestServer_HandlesUnexpectedPathRequest(t *testing.T) {
@@ -87,7 +86,7 @@ func TestServer_HandlesUnexpectedPathRequest(t *testing.T) {
 
 	s.On("GET", "/")
 
-	httpx.DefaultClient.Get(s.URL() + "/test/path")
+	http.Get(s.URL() + "/test/path")
 }
 
 func TestServer_HandlesExpectationNTimes(t *testing.T) {
@@ -103,9 +102,9 @@ func TestServer_HandlesExpectationNTimes(t *testing.T) {
 	defer s.Close()
 	s.On("GET", "/test/path").Times(2)
 
-	httpx.DefaultClient.Get(s.URL() + "/test/path")
-	httpx.DefaultClient.Get(s.URL() + "/test/path")
-	httpx.DefaultClient.Get(s.URL() + "/test/path")
+	http.Get(s.URL() + "/test/path")
+	http.Get(s.URL() + "/test/path")
+	http.Get(s.URL() + "/test/path")
 }
 
 func TestServer_HandlesExpectationUnlimitedTimes(t *testing.T) {
@@ -121,8 +120,8 @@ func TestServer_HandlesExpectationUnlimitedTimes(t *testing.T) {
 	defer s.Close()
 	s.On("GET", "/test/path")
 
-	httpx.DefaultClient.Get(s.URL() + "/test/path")
-	httpx.DefaultClient.Get(s.URL() + "/test/path")
+	http.Get(s.URL() + "/test/path")
+	http.Get(s.URL() + "/test/path")
 }
 
 func TestServer_ExpectationReturnsBodyBytes(t *testing.T) {
@@ -131,7 +130,7 @@ func TestServer_ExpectationReturnsBodyBytes(t *testing.T) {
 
 	s.On("GET", "/test/path").Returns(400, []byte("test"))
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	assert.Equal(t, 400, res.StatusCode)
 	b, _ := ioutil.ReadAll(res.Body)
@@ -146,7 +145,7 @@ func TestServer_ExpectationReturnsBodyString(t *testing.T) {
 
 	s.On("GET", "/test/path").ReturnsString(400, "test")
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	assert.Equal(t, 400, res.StatusCode)
 	b, _ := ioutil.ReadAll(res.Body)
@@ -161,7 +160,7 @@ func TestServer_ExpectationReturnsStatusCode(t *testing.T) {
 
 	s.On("GET", "/test/path").ReturnsStatus(400)
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	assert.Equal(t, 400, res.StatusCode)
 	b, _ := ioutil.ReadAll(res.Body)
@@ -176,7 +175,7 @@ func TestServer_ExpectationReturnsHeaders(t *testing.T) {
 
 	s.On("GET", "/test/path").Header("foo", "bar").ReturnsStatus(200)
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	v := res.Header.Get("foo")
 	assert.Equal(t, "bar", v)
@@ -192,7 +191,7 @@ func TestServer_ExpectationUsesHandleFunc(t *testing.T) {
 		w.WriteHeader(400)
 	})
 
-	res, err := httpx.DefaultClient.Get(s.URL() + "/test/path")
+	res, err := http.Get(s.URL() + "/test/path")
 	assert.NoError(t, err)
 	assert.Equal(t, 400, res.StatusCode)
 }

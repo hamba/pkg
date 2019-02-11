@@ -4,7 +4,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/msales/pkg/v3/httpx/middleware"
+	"github.com/hamba/pkg/httpx/middleware"
 	"github.com/stretchr/testify/assert"
 )
 
