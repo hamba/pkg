@@ -1,4 +1,4 @@
-// Package breaker implements the Circuit Breaker design patter.
+// Package breaker implements the Circuit Breaker design pattern.
 package breaker
 
 import (

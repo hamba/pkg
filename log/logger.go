@@ -16,6 +16,7 @@ var (
 	// Null is the null Logger instance.
 	Null = &nullLogger{}
 )
+
 // Loggable represents an object that has a Logger.
 type Loggable interface {
 	Logger() Logger

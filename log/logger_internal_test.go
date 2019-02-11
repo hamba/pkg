@@ -17,20 +17,12 @@ func TestFatal(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Error", "test log", []interface{}{"foo", "bar"})
 	m.On("Close").Return(nil)
-	labl := &testLoggable{l: m}
+	labl := NewMockLoggable(m)
 
 	Fatal(labl, "test log", "foo", "bar")
 
 	m.AssertExpectations(t)
 	assert.Equal(t, 1, calledCode)
-}
-
-type testLoggable struct {
-	l Logger
-}
-
-func (l *testLoggable) Logger() Logger {
-	return l.l
 }
 
 type MockLogger struct {

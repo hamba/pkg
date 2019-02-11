@@ -9,7 +9,7 @@ import (
 //go:linkname getNanotime runtime.nanotime
 func getNanotime() int64
 
-// Nanotime represents an instant in time with nanosecond precision useing runtime.nanotime.
+// Nanotime represents an instant in time with nanosecond precision using runtime.nanotime.
 type Nanotime int64
 
 // Now gets the current local time as a Nanotime.

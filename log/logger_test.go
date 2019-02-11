@@ -10,7 +10,7 @@ import (
 func TestDebug(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Debug", "test log", []interface{}{"foo", "bar"})
-	labl := &testLoggable{l: m}
+	labl := log.NewMockLoggable(m)
 
 	log.Debug(labl, "test log", "foo", "bar")
 
@@ -20,7 +20,7 @@ func TestDebug(t *testing.T) {
 func TestInfo(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Info", "test log", []interface{}{"foo", "bar"})
-	labl := &testLoggable{l: m}
+	labl := log.NewMockLoggable(m)
 
 	log.Info(labl, "test log", "foo", "bar")
 
@@ -30,7 +30,7 @@ func TestInfo(t *testing.T) {
 func TestError(t *testing.T) {
 	m := new(MockLogger)
 	m.On("Error", "test log", []interface{}{"foo", "bar"})
-	labl := &testLoggable{l: m}
+	labl := log.NewMockLoggable(m)
 
 	log.Error(labl, "test log", "foo", "bar")
 
@@ -47,14 +47,6 @@ func TestNullLogger_Info(t *testing.T) {
 
 func TestNullLogger_Error(t *testing.T) {
 	log.Null.Error("test log", "foo", "bar")
-}
-
-type testLoggable struct {
-	l log.Logger
-}
-
-func (l *testLoggable) Logger() log.Logger {
-	return l.l
 }
 
 type MockLogger struct {
