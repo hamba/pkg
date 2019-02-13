@@ -47,6 +47,14 @@ func TestNullCache_GetFloat64(t *testing.T) {
 	assert.Equal(t, float64(0), v)
 }
 
+func TestNullCache_GetString(t *testing.T) {
+	i := cache.Null.Get("test")
+	v, err := i.String()
+
+	assert.NoError(t, err)
+	assert.Equal(t, "", v)
+}
+
 func TestNullCache_GetMulti(t *testing.T) {
 	v, err := cache.Null.GetMulti("test")
 

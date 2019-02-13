@@ -2,195 +2,313 @@ package cache_test
 
 import (
 	"errors"
-	"strconv"
 	"testing"
 
 	"github.com/hamba/pkg/cache"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestItem_Bool(t *testing.T) {
-	decoder := stringDecoder{}
-	tests := []struct {
-		item   cache.Item
-		ok     bool
-		expect bool
-	}{
-		{cache.Item{Decoder: decoder, Value: []byte("1")}, true, true},
-		{cache.Item{Decoder: decoder, Err: errors.New("")}, false, false},
+	dec := new(MockDecoder)
+	dec.On("Bool", []byte("1")).Return(true, nil)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("1"),
+		Err:     nil,
 	}
 
-	for i, tt := range tests {
-		got, err := tt.item.Bool()
-		if ok := err == nil; ok != tt.ok {
-			if err != nil {
-				assert.FailNow(t, "test %d, unexpected failure: %v", i, err)
-			} else {
-				assert.FailNow(t, "test %d, unexpected success", i)
-			}
-		}
+	got, err := item.Bool()
 
-		assert.Equal(t, tt.expect, got)
+	assert.NoError(t, err)
+	assert.Equal(t, true, got)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_BoolDecoderError(t *testing.T) {
+	dec := new(MockDecoder)
+	dec.On("Bool", []byte("1")).Return(false, errors.New("test"))
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("1"),
+		Err:     nil,
 	}
+
+	_, err := item.Bool()
+
+	assert.Error(t, err)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_BoolError(t *testing.T) {
+	dec := new(MockDecoder)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("1"),
+		Err:     errors.New("test"),
+	}
+
+	_, err := item.Bool()
+
+	assert.Error(t, err)
 }
 
 func TestItem_Bytes(t *testing.T) {
-	tests := []struct {
-		item   cache.Item
-		ok     bool
-		expect []byte
-	}{
-		{cache.Item{Value: []byte{0x01}}, true, []byte{0x01}},
-		{cache.Item{Err: errors.New("")}, false, nil},
+	dec := new(MockDecoder)
+	dec.On("Bytes", []byte{0x01}).Return([]byte{0x01}, nil)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte{0x01},
+		Err:     nil,
 	}
 
-	for i, tt := range tests {
-		got, err := tt.item.Bytes()
-		if ok := err == nil; ok != tt.ok {
-			if err != nil {
-				assert.FailNow(t, "test %d, unexpected failure: %v", i, err)
-			} else {
-				assert.FailNow(t, "test %d, unexpected success", i)
-			}
-		}
+	got, err := item.Bytes()
 
-		assert.Equal(t, tt.expect, got)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{0x01}, got)
+	dec.AssertExpectations(t)
 }
 
-func TestItem_String(t *testing.T) {
-	tests := []struct {
-		item   cache.Item
-		ok     bool
-		expect string
-	}{
-		{cache.Item{Value: []byte("hello")}, true, "hello"},
-		{cache.Item{Err: errors.New("")}, false, ""},
+func TestItem_BytesDecoderError(t *testing.T) {
+	dec := new(MockDecoder)
+	dec.On("Bytes", []byte{0x01}).Return([]byte{}, errors.New("test"))
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte{0x01},
+		Err:     nil,
 	}
 
-	for i, tt := range tests {
-		got, err := tt.item.String()
-		if ok := err == nil; ok != tt.ok {
-			if err != nil {
-				assert.FailNow(t, "test %d, unexpected failure: %v", i, err)
-			} else {
-				assert.FailNow(t, "test %d, unexpected success", i)
-			}
-		}
+	_, err := item.Bytes()
 
-		assert.Equal(t, tt.expect, got)
+	assert.Error(t, err)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_BytesError(t *testing.T) {
+	dec := new(MockDecoder)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte{0x01},
+		Err:     errors.New("test"),
 	}
+
+	_, err := item.Bytes()
+
+	assert.Error(t, err)
 }
 
 func TestItem_Int64(t *testing.T) {
-	decoder := stringDecoder{}
-	tests := []struct {
-		item   cache.Item
-		ok     bool
-		expect int64
-	}{
-		{cache.Item{Decoder: decoder, Value: []byte("1")}, true, 1},
-		{cache.Item{Decoder: decoder, Value: []byte("a")}, false, 0},
-		{cache.Item{Decoder: decoder, Err: errors.New("")}, false, 0},
+	dec := new(MockDecoder)
+	dec.On("Int64", []byte("2")).Return(int64(2), nil)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2"),
+		Err:     nil,
 	}
 
-	for i, tt := range tests {
-		got, err := tt.item.Int64()
-		if ok := err == nil; ok != tt.ok {
-			if err != nil {
-				assert.FailNow(t, "test %d, unexpected failure: %v", i, err)
-			} else {
-				assert.FailNow(t, "test %d, unexpected success", i)
-			}
-		}
+	got, err := item.Int64()
 
-		assert.Equal(t, tt.expect, got)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(2), got)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_Int64DecoderError(t *testing.T) {
+	dec := new(MockDecoder)
+	dec.On("Int64", []byte("2")).Return(int64(0), errors.New("test"))
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2"),
+		Err:     nil,
 	}
+
+	_, err := item.Int64()
+
+	assert.Error(t, err)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_Int64Error(t *testing.T) {
+	dec := new(MockDecoder)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2"),
+		Err:     errors.New("test"),
+	}
+
+	_, err := item.Int64()
+
+	assert.Error(t, err)
 }
 
 func TestItem_Uint64(t *testing.T) {
-	decoder := stringDecoder{}
-	tests := []struct {
-		item   cache.Item
-		ok     bool
-		expect uint64
-	}{
-		{cache.Item{Decoder: decoder, Value: []byte("1")}, true, 1},
-		{cache.Item{Decoder: decoder, Value: []byte("a")}, false, 0},
-		{cache.Item{Decoder: decoder, Err: errors.New("")}, false, 0},
+	dec := new(MockDecoder)
+	dec.On("Uint64", []byte("2")).Return(uint64(2), nil)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2"),
+		Err:     nil,
 	}
 
-	for i, tt := range tests {
-		got, err := tt.item.Uint64()
-		if ok := (err == nil); ok != tt.ok {
-			if err != nil {
-				assert.FailNow(t, "test %d, unexpected failure: %v", i, err)
-			} else {
-				assert.FailNow(t, "test %d, unexpected success", i)
-			}
-		}
+	got, err := item.Uint64()
 
-		assert.Equal(t, tt.expect, got)
+	assert.NoError(t, err)
+	assert.Equal(t, uint64(2), got)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_Uint64DecoderError(t *testing.T) {
+	dec := new(MockDecoder)
+	dec.On("Uint64", []byte("2")).Return(uint64(0), errors.New("test"))
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2"),
+		Err:     nil,
 	}
+
+	_, err := item.Uint64()
+
+	assert.Error(t, err)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_Uint64Error(t *testing.T) {
+	dec := new(MockDecoder)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2"),
+		Err:     errors.New("test"),
+	}
+
+	_, err := item.Uint64()
+
+	assert.Error(t, err)
 }
 
 func TestItem_Float64(t *testing.T) {
-	decoder := stringDecoder{}
-	tests := []struct {
-		item   cache.Item
-		ok     bool
-		expect float64
-	}{
-		{cache.Item{Decoder: decoder, Value: []byte("1.2")}, true, 1.2},
-		{cache.Item{Decoder: decoder, Value: []byte("a")}, false, 0},
-		{cache.Item{Decoder: decoder, Err: errors.New("")}, false, 0},
+	dec := new(MockDecoder)
+	dec.On("Float64", []byte("2.3")).Return(float64(2.3), nil)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2.3"),
+		Err:     nil,
 	}
 
-	for i, tt := range tests {
-		got, err := tt.item.Float64()
-		if ok := (err == nil); ok != tt.ok {
-			if err != nil {
-				assert.FailNow(t, "test %d, unexpected failure: %v", i, err)
-			} else {
-				assert.FailNow(t, "test %d, unexpected success", i)
-			}
-		}
+	got, err := item.Float64()
 
-		assert.Equal(t, tt.expect, got)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, float64(2.3), got)
+	dec.AssertExpectations(t)
 }
 
-func TestItem_Err(t *testing.T) {
-	expect := errors.New("Err")
-	tests := []struct {
-		item   cache.Item
-		expect error
-	}{
-		{cache.Item{}, nil},
-		{cache.Item{Err: expect}, expect},
+func TestItem_Float64DecoderError(t *testing.T) {
+	dec := new(MockDecoder)
+	dec.On("Float64", []byte("2.3")).Return(float64(0), errors.New("test"))
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2.3"),
+		Err:     nil,
 	}
 
-	for _, tt := range tests {
-		err := tt.item.Error()
+	_, err := item.Float64()
 
-		assert.Equal(t, tt.expect, err)
+	assert.Error(t, err)
+	dec.AssertExpectations(t)
+}
+
+func TestItem_Float64Error(t *testing.T) {
+	dec := new(MockDecoder)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("2.3"),
+		Err:     errors.New("test"),
 	}
+
+	_, err := item.Float64()
+
+	assert.Error(t, err)
 }
 
-type stringDecoder struct{}
+func TestItem_String(t *testing.T) {
+	dec := new(MockDecoder)
+	dec.On("String", []byte("test")).Return("test", nil)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("test"),
+		Err:     nil,
+	}
 
-func (d stringDecoder) Bool(v []byte) (bool, error) {
-	return string(v) == "1", nil
+	got, err := item.String()
+
+	assert.NoError(t, err)
+	assert.Equal(t, "test", got)
+	dec.AssertExpectations(t)
 }
 
-func (d stringDecoder) Int64(v []byte) (int64, error) {
-	return strconv.ParseInt(string(v), 10, 64)
+func TestItem_StringDecoderError(t *testing.T) {
+	dec := new(MockDecoder)
+	dec.On("String", []byte("test")).Return("", errors.New("test"))
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("test"),
+		Err:     nil,
+	}
+
+	_, err := item.String()
+
+	assert.Error(t, err)
+	dec.AssertExpectations(t)
 }
 
-func (d stringDecoder) Uint64(v []byte) (uint64, error) {
-	return strconv.ParseUint(string(v), 10, 64)
+func TestItem_StringError(t *testing.T) {
+	dec := new(MockDecoder)
+	item := cache.Item{
+		Decoder: dec,
+		Value:   []byte("test"),
+		Err:     errors.New("test"),
+	}
+
+	_, err := item.String()
+
+	assert.Error(t, err)
 }
 
-func (d stringDecoder) Float64(v []byte) (float64, error) {
-	return strconv.ParseFloat(string(v), 64)
+type MockDecoder struct {
+	mock.Mock
+}
+
+func (m *MockDecoder) Bool(v interface{}) (bool, error) {
+	args := m.Called(v)
+
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *MockDecoder) Bytes(v interface{}) ([]byte, error) {
+	args := m.Called(v)
+
+	return args.Get(0).([]byte), args.Error(1)
+}
+
+func (m *MockDecoder) Int64(v interface{}) (int64, error) {
+	args := m.Called(v)
+
+	return args.Get(0).(int64), args.Error(1)
+}
+
+func (m *MockDecoder) Uint64(v interface{}) (uint64, error) {
+	args := m.Called(v)
+
+	return args.Get(0).(uint64), args.Error(1)
+}
+
+func (m *MockDecoder) Float64(v interface{}) (float64, error) {
+	args := m.Called(v)
+
+	return args.Get(0).(float64), args.Error(1)
+}
+
+func (m *MockDecoder) String(v interface{}) (string, error) {
+	args := m.Called(v)
+
+	return args.String(0), args.Error(1)
 }

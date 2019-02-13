@@ -1,17 +1,19 @@
 package cache
 
-// Decoder represents a byte decoder.
+// Decoder represents a value decoder.
 type Decoder interface {
-	Bool([]byte) (bool, error)
-	Int64([]byte) (int64, error)
-	Uint64([]byte) (uint64, error)
-	Float64([]byte) (float64, error)
+	Bool(interface{}) (bool, error)
+	Bytes(interface{}) ([]byte, error)
+	Int64(interface{}) (int64, error)
+	Uint64(interface{}) (uint64, error)
+	Float64(interface{}) (float64, error)
+	String(interface{}) (string, error)
 }
 
 // Item represents an item to be returned or stored in the cache
 type Item struct {
 	Decoder Decoder
-	Value   []byte
+	Value   interface{}
 	Err     error
 }
 
@@ -26,16 +28,11 @@ func (i Item) Bool() (bool, error) {
 
 // Bytes gets the cache items Value as bytes.
 func (i Item) Bytes() ([]byte, error) {
-	return i.Value, i.Err
-}
-
-// Bytes gets the cache items Value as a string.
-func (i Item) String() (string, error) {
 	if i.Err != nil {
-		return "", i.Err
+		return nil, i.Err
 	}
 
-	return string(i.Value), nil
+	return i.Decoder.Bytes(i.Value)
 }
 
 // Int64 gets the cache items Value as an int64, or and error.
@@ -65,7 +62,11 @@ func (i Item) Float64() (float64, error) {
 	return i.Decoder.Float64(i.Value)
 }
 
-// Err returns the item error or nil.
-func (i Item) Error() error {
-	return i.Err
+// Bytes gets the cache items Value as a string.
+func (i Item) String() (string, error) {
+	if i.Err != nil {
+		return "", i.Err
+	}
+
+	return i.Decoder.String(i.Value)
 }
