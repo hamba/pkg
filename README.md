@@ -1,4 +1,4 @@
-![Logo](http://svg.wiersma.co.za/github/project?lang=go&title=pkg&tag=Go%20package%20collection)
+![Logo](http://svg.wiersma.co.za/hamba/project?title=pkg&tag=Go%20package%20collection)
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/hamba/pkg)](https://goreportcard.com/report/github.com/hamba/pkg)
 [![Build Status](https://travis-ci.com/hamba/pkg.svg?branch=master)](https://travis-ci.com/hamba/pkg)
