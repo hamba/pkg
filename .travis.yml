@@ -7,10 +7,6 @@ go:
 env:
   - GO111MODULE=on
 
-services:
-  - redis-server
-  - memcached
-
 before_install:
   - go mod download
   - go get -u golang.org/x/lint/golint
