@@ -12,9 +12,18 @@ type Decoder interface {
 
 // Item represents an item to be returned or stored in the cache
 type Item struct {
-	Decoder Decoder
-	Value   interface{}
-	Err     error
+	dec   Decoder
+	Value interface{}
+	Err   error
+}
+
+// NewItem creates a new Item.
+func NewItem(d Decoder, v interface{}, err error) Item {
+	return Item{
+		dec:   d,
+		Value: v,
+		Err:   err,
+	}
 }
 
 // Bool gets the cache items Value as a bool, or and error.
@@ -23,7 +32,7 @@ func (i Item) Bool() (bool, error) {
 		return false, i.Err
 	}
 
-	return i.Decoder.Bool(i.Value)
+	return i.dec.Bool(i.Value)
 }
 
 // Bytes gets the cache items Value as bytes.
@@ -32,7 +41,7 @@ func (i Item) Bytes() ([]byte, error) {
 		return nil, i.Err
 	}
 
-	return i.Decoder.Bytes(i.Value)
+	return i.dec.Bytes(i.Value)
 }
 
 // Int64 gets the cache items Value as an int64, or and error.
@@ -41,7 +50,7 @@ func (i Item) Int64() (int64, error) {
 		return 0, i.Err
 	}
 
-	return i.Decoder.Int64(i.Value)
+	return i.dec.Int64(i.Value)
 }
 
 // Uint64 gets the cache items Value as a uint64, or and error.
@@ -50,7 +59,7 @@ func (i Item) Uint64() (uint64, error) {
 		return 0, i.Err
 	}
 
-	return i.Decoder.Uint64(i.Value)
+	return i.dec.Uint64(i.Value)
 }
 
 // Float64 gets the cache items Value as a float64, or and error.
@@ -59,7 +68,7 @@ func (i Item) Float64() (float64, error) {
 		return 0, i.Err
 	}
 
-	return i.Decoder.Float64(i.Value)
+	return i.dec.Float64(i.Value)
 }
 
 // Bytes gets the cache items Value as a string.
@@ -68,5 +77,5 @@ func (i Item) String() (string, error) {
 		return "", i.Err
 	}
 
-	return i.Decoder.String(i.Value)
+	return i.dec.String(i.Value)
 }

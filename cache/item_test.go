@@ -12,11 +12,7 @@ import (
 func TestItem_Bool(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Bool", []byte("1")).Return(true, nil)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("1"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("1"), nil)
 
 	got, err := item.Bool()
 
@@ -28,11 +24,7 @@ func TestItem_Bool(t *testing.T) {
 func TestItem_BoolDecoderError(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Bool", []byte("1")).Return(false, errors.New("test"))
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("1"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("1"), nil)
 
 	_, err := item.Bool()
 
@@ -42,11 +34,7 @@ func TestItem_BoolDecoderError(t *testing.T) {
 
 func TestItem_BoolError(t *testing.T) {
 	dec := new(MockDecoder)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("1"),
-		Err:     errors.New("test"),
-	}
+	item := cache.NewItem(dec, []byte("1"), errors.New("test"))
 
 	_, err := item.Bool()
 
@@ -56,11 +44,7 @@ func TestItem_BoolError(t *testing.T) {
 func TestItem_Bytes(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Bytes", []byte{0x01}).Return([]byte{0x01}, nil)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte{0x01},
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte{0x01}, nil)
 
 	got, err := item.Bytes()
 
@@ -72,11 +56,7 @@ func TestItem_Bytes(t *testing.T) {
 func TestItem_BytesDecoderError(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Bytes", []byte{0x01}).Return([]byte{}, errors.New("test"))
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte{0x01},
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte{0x01}, nil)
 
 	_, err := item.Bytes()
 
@@ -86,11 +66,7 @@ func TestItem_BytesDecoderError(t *testing.T) {
 
 func TestItem_BytesError(t *testing.T) {
 	dec := new(MockDecoder)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte{0x01},
-		Err:     errors.New("test"),
-	}
+	item := cache.NewItem(dec, []byte{0x01}, errors.New("test"))
 
 	_, err := item.Bytes()
 
@@ -100,11 +76,7 @@ func TestItem_BytesError(t *testing.T) {
 func TestItem_Int64(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Int64", []byte("2")).Return(int64(2), nil)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("2"), nil)
 
 	got, err := item.Int64()
 
@@ -116,11 +88,7 @@ func TestItem_Int64(t *testing.T) {
 func TestItem_Int64DecoderError(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Int64", []byte("2")).Return(int64(0), errors.New("test"))
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("2"), nil)
 
 	_, err := item.Int64()
 
@@ -130,11 +98,7 @@ func TestItem_Int64DecoderError(t *testing.T) {
 
 func TestItem_Int64Error(t *testing.T) {
 	dec := new(MockDecoder)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2"),
-		Err:     errors.New("test"),
-	}
+	item := cache.NewItem(dec, []byte("2"), errors.New("test"))
 
 	_, err := item.Int64()
 
@@ -144,11 +108,7 @@ func TestItem_Int64Error(t *testing.T) {
 func TestItem_Uint64(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Uint64", []byte("2")).Return(uint64(2), nil)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("2"), nil)
 
 	got, err := item.Uint64()
 
@@ -160,11 +120,7 @@ func TestItem_Uint64(t *testing.T) {
 func TestItem_Uint64DecoderError(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Uint64", []byte("2")).Return(uint64(0), errors.New("test"))
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("2"), nil)
 
 	_, err := item.Uint64()
 
@@ -174,11 +130,7 @@ func TestItem_Uint64DecoderError(t *testing.T) {
 
 func TestItem_Uint64Error(t *testing.T) {
 	dec := new(MockDecoder)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2"),
-		Err:     errors.New("test"),
-	}
+	item := cache.NewItem(dec, []byte("2"), errors.New("test"))
 
 	_, err := item.Uint64()
 
@@ -188,11 +140,7 @@ func TestItem_Uint64Error(t *testing.T) {
 func TestItem_Float64(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Float64", []byte("2.3")).Return(float64(2.3), nil)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2.3"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("2.3"), nil)
 
 	got, err := item.Float64()
 
@@ -204,11 +152,7 @@ func TestItem_Float64(t *testing.T) {
 func TestItem_Float64DecoderError(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("Float64", []byte("2.3")).Return(float64(0), errors.New("test"))
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2.3"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("2.3"), nil)
 
 	_, err := item.Float64()
 
@@ -218,11 +162,7 @@ func TestItem_Float64DecoderError(t *testing.T) {
 
 func TestItem_Float64Error(t *testing.T) {
 	dec := new(MockDecoder)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("2.3"),
-		Err:     errors.New("test"),
-	}
+	item := cache.NewItem(dec, []byte("2.3"), errors.New("test"))
 
 	_, err := item.Float64()
 
@@ -232,11 +172,7 @@ func TestItem_Float64Error(t *testing.T) {
 func TestItem_String(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("String", []byte("test")).Return("test", nil)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("test"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("test"), nil)
 
 	got, err := item.String()
 
@@ -248,11 +184,7 @@ func TestItem_String(t *testing.T) {
 func TestItem_StringDecoderError(t *testing.T) {
 	dec := new(MockDecoder)
 	dec.On("String", []byte("test")).Return("", errors.New("test"))
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("test"),
-		Err:     nil,
-	}
+	item := cache.NewItem(dec, []byte("test"), nil)
 
 	_, err := item.String()
 
@@ -262,11 +194,7 @@ func TestItem_StringDecoderError(t *testing.T) {
 
 func TestItem_StringError(t *testing.T) {
 	dec := new(MockDecoder)
-	item := cache.Item{
-		Decoder: dec,
-		Value:   []byte("test"),
-		Err:     errors.New("test"),
-	}
+	item := cache.NewItem(dec, []byte("test"), errors.New("test"))
 
 	_, err := item.String()
 

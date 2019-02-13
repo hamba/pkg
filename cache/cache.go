@@ -80,7 +80,7 @@ type nullCache struct{}
 
 // Get gets the item for the given key.
 func (c nullCache) Get(k string) Item {
-	return Item{Decoder: nullDecoder{}, Value: nil}
+	return NewItem(nullDecoder{}, nil, nil)
 }
 
 // GetMulti gets the items for the given keys.
