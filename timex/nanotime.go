@@ -13,11 +13,15 @@ func getNanotime() int64
 type Nanotime int64
 
 // Now gets the current local time as a Nanotime.
+//
+// Deprecated: Use hamba/timex/mono instead.
 func Now() Nanotime {
 	return Nanotime(getNanotime())
 }
 
 // Since returns the time elapsed since t.
+//
+// Deprecated: Use hamba/timex/mono instead.
 func Since(t Nanotime) time.Duration {
 	return time.Duration(Now() - t)
 }

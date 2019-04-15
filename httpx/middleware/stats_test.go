@@ -16,19 +16,19 @@ func TestWithRequestStats(t *testing.T) {
 		name     string
 		path     string
 		tagFuncs []middleware.TagsFunc
-		wantTags []interface{}
+		wantTags []string
 	}{
 		{
 			name:     "With Default Tags",
 			path:     "/test",
 			tagFuncs: nil,
-			wantTags: []interface{}{"method", "GET", "path", "/test"},
+			wantTags: []string{"method", "GET", "path", "/test"},
 		},
 		{
 			name:     "With Custom Tags",
 			path:     "/test",
 			tagFuncs: []middleware.TagsFunc{testTags},
-			wantTags: []interface{}{"method", "GET"},
+			wantTags: []string{"method", "GET"},
 		},
 	}
 
@@ -57,8 +57,8 @@ func TestWithRequestStats(t *testing.T) {
 	}
 }
 
-func testTags(r *http.Request) []interface{} {
-	return []interface{}{
+func testTags(r *http.Request) []string {
+	return []string{
 		"method", r.Method,
 	}
 }
@@ -67,15 +67,15 @@ type MockStats struct {
 	mock.Mock
 }
 
-func (m *MockStats) Inc(name string, value int64, rate float32, tags ...interface{}) {
+func (m *MockStats) Inc(name string, value int64, rate float32, tags ...string) {
 	m.Called(name, value, rate, tags)
 }
 
-func (m *MockStats) Gauge(name string, value float64, rate float32, tags ...interface{}) {
+func (m *MockStats) Gauge(name string, value float64, rate float32, tags ...string) {
 	m.Called(name, value, rate, tags)
 }
 
-func (m *MockStats) Timing(name string, value time.Duration, rate float32, tags ...interface{}) {
+func (m *MockStats) Timing(name string, value time.Duration, rate float32, tags ...string) {
 	m.Called(name, value, rate, tags)
 }
 
