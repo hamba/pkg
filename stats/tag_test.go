@@ -19,9 +19,9 @@ func TestNewTaggedStatter(t *testing.T) {
 
 func TestTaggedStatter_MergesWithPreviousTaggedStater(t *testing.T) {
 	m := new(MockStats)
-	m.On("Inc", "test", int64(1), float32(1), []interface{}{"foo", "bar", "test", 1234, "global", "foobar"}).Return(nil)
+	m.On("Inc", "test", int64(1), float32(1), []string{"foo", "bar", "test", "1234", "global", "foobar"}).Return(nil)
 
-	s1 := stats.NewTaggedStatter(m, "test", 1234)
+	s1 := stats.NewTaggedStatter(m, "test", "1234")
 
 	s2 := stats.NewTaggedStatter(s1, "global", "foobar")
 
@@ -32,7 +32,7 @@ func TestTaggedStatter_MergesWithPreviousTaggedStater(t *testing.T) {
 
 func TestTaggedStatter_NormalisesTags(t *testing.T) {
 	m := new(MockStats)
-	m.On("Inc", "test", int64(1), float32(1), []interface{}{"foo", "bar", "global", nil, "STATTER_ERROR", "Normalised odd number of tags by adding nil"}).Return(nil)
+	m.On("Inc", "test", int64(1), float32(1), []string{"foo", "bar", "global", "", "STATTER_ERROR", "Normalised odd number of tags by adding an empty string"}).Return(nil)
 	s := stats.NewTaggedStatter(m, "global")
 
 	s.Inc("test", 1, 1.0, "foo", "bar")
@@ -42,7 +42,7 @@ func TestTaggedStatter_NormalisesTags(t *testing.T) {
 
 func TestTaggedStatter_Inc(t *testing.T) {
 	m := new(MockStats)
-	m.On("Inc", "test", int64(1), float32(1), []interface{}{"foo", "bar", "global", "foobar"}).Return(nil)
+	m.On("Inc", "test", int64(1), float32(1), []string{"foo", "bar", "global", "foobar"}).Return(nil)
 	s := stats.NewTaggedStatter(m, "global", "foobar")
 
 	s.Inc("test", 1, 1.0, "foo", "bar")
@@ -52,7 +52,7 @@ func TestTaggedStatter_Inc(t *testing.T) {
 
 func TestTaggedStatter_Gauge(t *testing.T) {
 	m := new(MockStats)
-	m.On("Gauge", "test", float64(1), float32(1), []interface{}{"foo", "bar", "global", "foobar"}).Return(nil)
+	m.On("Gauge", "test", float64(1), float32(1), []string{"foo", "bar", "global", "foobar"}).Return(nil)
 	s := stats.NewTaggedStatter(m, "global", "foobar")
 
 	s.Gauge("test", 1.0, 1.0, "foo", "bar")
@@ -62,7 +62,7 @@ func TestTaggedStatter_Gauge(t *testing.T) {
 
 func TestTaggedStatter_Timing(t *testing.T) {
 	m := new(MockStats)
-	m.On("Timing", "test", time.Millisecond, float32(1), []interface{}{"foo", "bar", "global", "foobar"}).Return(nil)
+	m.On("Timing", "test", time.Millisecond, float32(1), []string{"foo", "bar", "global", "foobar"}).Return(nil)
 	s := stats.NewTaggedStatter(m, "global", "foobar")
 
 	s.Timing("test", time.Millisecond, 1.0, "foo", "bar")

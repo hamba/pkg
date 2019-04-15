@@ -10,7 +10,7 @@ import (
 
 func TestGroup_Inc(t *testing.T) {
 	m := new(MockStats)
-	m.On("Inc", "prefix.test", int64(1), float32(1), []interface{}{"foo", "bar"}).Return(nil)
+	m.On("Inc", "prefix.test", int64(1), float32(1), []string{"foo", "bar"}).Return(nil)
 	sable := &testStatable{s: m}
 
 	stats.Group(sable, "prefix", func(s stats.Statter) {
@@ -22,7 +22,7 @@ func TestGroup_Inc(t *testing.T) {
 
 func TestGroup_Gauge(t *testing.T) {
 	m := new(MockStats)
-	m.On("Gauge", "prefix.test", float64(1), float32(1), []interface{}{"foo", "bar"}).Return(nil)
+	m.On("Gauge", "prefix.test", float64(1), float32(1), []string{"foo", "bar"}).Return(nil)
 	sable := &testStatable{s: m}
 
 	stats.Group(sable, "prefix", func(s stats.Statter) {
@@ -34,7 +34,7 @@ func TestGroup_Gauge(t *testing.T) {
 
 func TestGroup_Timing(t *testing.T) {
 	m := new(MockStats)
-	m.On("Timing", "prefix.test", time.Millisecond, float32(1), []interface{}{"foo", "bar"}).Return(nil)
+	m.On("Timing", "prefix.test", time.Millisecond, float32(1), []string{"foo", "bar"}).Return(nil)
 	sable := &testStatable{s: m}
 
 	stats.Group(sable, "prefix", func(s stats.Statter) {

@@ -10,17 +10,17 @@ type group struct {
 }
 
 // Inc increments a count by the value.
-func (g group) Inc(name string, value int64, rate float32, tags ...interface{}) {
+func (g group) Inc(name string, value int64, rate float32, tags ...string) {
 	g.s.Inc(g.prefix+name, value, rate, tags...)
 }
 
 // Gauge measures the value of a metric.
-func (g group) Gauge(name string, value float64, rate float32, tags ...interface{}) {
+func (g group) Gauge(name string, value float64, rate float32, tags ...string) {
 	g.s.Gauge(g.prefix+name, value, rate, tags...)
 }
 
 // Timing sends the value of a Duration.
-func (g group) Timing(name string, value time.Duration, rate float32, tags ...interface{}) {
+func (g group) Timing(name string, value time.Duration, rate float32, tags ...string) {
 	g.s.Timing(g.prefix+name, value, rate, tags...)
 }
 

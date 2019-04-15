@@ -10,7 +10,7 @@ import (
 
 func TestInc(t *testing.T) {
 	m := new(MockStats)
-	m.On("Inc", "test", int64(1), float32(1.0), []interface{}(nil))
+	m.On("Inc", "test", int64(1), float32(1.0), []string(nil))
 	sable := &testStatable{s: m}
 
 	stats.Inc(sable, "test", 1, 1.0)
@@ -20,7 +20,7 @@ func TestInc(t *testing.T) {
 
 func TestGauge(t *testing.T) {
 	m := new(MockStats)
-	m.On("Gauge", "test", float64(1), float32(1.0), []interface{}(nil))
+	m.On("Gauge", "test", float64(1), float32(1.0), []string(nil))
 	sable := &testStatable{s: m}
 
 	stats.Gauge(sable, "test", 1, 1.0)
@@ -30,7 +30,7 @@ func TestGauge(t *testing.T) {
 
 func TestTiming(t *testing.T) {
 	m := new(MockStats)
-	m.On("Timing", "test", time.Second, float32(1.0), []interface{}(nil))
+	m.On("Timing", "test", time.Second, float32(1.0), []string(nil))
 	sable := &testStatable{s: m}
 
 	stats.Timing(sable, "test", time.Second, 1.0)

@@ -1,7 +1,7 @@
 package stats
 
 import (
-	"github.com/hamba/pkg/timex"
+	"github.com/hamba/timex/mono"
 )
 
 // Timer represents a timer.
@@ -14,23 +14,23 @@ type Timer interface {
 
 type timer struct {
 	sable Statable
-	start timex.Nanotime
+	start int64
 	name  string
 	rate  float32
-	tags  []interface{}
+	tags  []string
 }
 
 // Time is a shorthand for Timing.
-func Time(sable Statable, name string, rate float32, tags ...interface{}) Timer {
+func Time(sable Statable, name string, rate float32, tags ...string) Timer {
 	t := &timer{sable: sable, name: name, rate: rate, tags: tags}
 	t.Start()
 	return t
 }
 
 func (t *timer) Start() {
-	t.start = timex.Now()
+	t.start = mono.Now()
 }
 
 func (t *timer) Done() {
-	Timing(t.sable, t.name, timex.Since(t.start), t.rate, t.tags...)
+	Timing(t.sable, t.name, mono.Since(t.start), t.rate, t.tags...)
 }
