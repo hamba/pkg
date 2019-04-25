@@ -36,7 +36,7 @@ func (s TaggedStatter) Timing(name string, value time.Duration, rate float32, ta
 	s.stats.Timing(name, value, rate, mergeTags(tags, s.tags)...)
 }
 
-// Close closes the client and flushes buffered stats, if applicable
+// Close closes the client and flushes buffered stats, if applicable.
 func (s TaggedStatter) Close() error {
 	return s.stats.Close()
 }
