@@ -71,15 +71,13 @@ func TestAggregateStatter_Inc(t *testing.T) {
 	m.On("Close").Return(nil)
 	s := stats.NewAggregateStatter(m, time.Millisecond)
 
-	time.Sleep(time.Millisecond)
-
 	s.Inc("test", 1, 1.0, "foo", "bar")
 	s.Inc("test", 1, 1.0, "foo", "bar")
 	s.Inc("test1", 1, 1.0, "foo", "bar")
 	s.Inc("test", 1, 1.0, "foo1", "bar")
 	s.Inc("rate", 1, 0.1)
 
-	time.Sleep(2 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	_ = s.Close()
 
@@ -94,14 +92,12 @@ func TestAggregateStatter_Gauge(t *testing.T) {
 	m.On("Close").Return(nil)
 	s := stats.NewAggregateStatter(m, time.Millisecond)
 
-	time.Sleep(time.Millisecond)
-
 	s.Gauge("test", 1, 1.0, "foo", "bar")
 	s.Gauge("test", 3, 1.0, "foo", "bar")
 	s.Gauge("test1", 4, 1.0, "foo", "bar")
 	s.Gauge("test", 5, 1.0, "foo1", "bar")
 
-	time.Sleep(2 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	_ = s.Close()
 
@@ -117,15 +113,13 @@ func TestAggregateStatter_Timing(t *testing.T) {
 	m.On("Close").Return(nil)
 	s := stats.NewAggregateStatter(m, time.Millisecond)
 
-	time.Sleep(time.Millisecond)
-
 	s.Timing("test", time.Millisecond, 1.0, "foo", "bar")
 	s.Timing("test", time.Second, 1.0, "foo", "bar")
 	s.Timing("test1", time.Millisecond, 1.0, "foo", "bar")
 	s.Timing("test", time.Millisecond, 1.0, "foo1", "bar")
 	s.Timing("rate", time.Millisecond, 0.1)
 
-	time.Sleep(2 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	_ = s.Close()
 
