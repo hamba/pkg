@@ -79,7 +79,7 @@ func TestAggregateStatter_Inc(t *testing.T) {
 	s.Inc("test", 1, 1.0, "foo1", "bar")
 	s.Inc("rate", 1, 0.1)
 
-	time.Sleep(2 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	_ = s.Close()
 
@@ -101,7 +101,7 @@ func TestAggregateStatter_Gauge(t *testing.T) {
 	s.Gauge("test1", 4, 1.0, "foo", "bar")
 	s.Gauge("test", 5, 1.0, "foo1", "bar")
 
-	time.Sleep(2 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	_ = s.Close()
 
@@ -125,7 +125,7 @@ func TestAggregateStatter_Timing(t *testing.T) {
 	s.Timing("test", time.Millisecond, 1.0, "foo1", "bar")
 	s.Timing("rate", time.Millisecond, 0.1)
 
-	time.Sleep(2 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	_ = s.Close()
 

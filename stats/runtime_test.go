@@ -21,7 +21,7 @@ func TestRuntime(t *testing.T) {
 	m.AssertCalled(t, "Gauge", "runtime.cpu.goroutines", mock.Anything, mock.Anything, mock.Anything)
 }
 
-func TestRuntimeFromContext(t *testing.T) {
+func TestRuntimeFromStatable(t *testing.T) {
 	m := new(MockStats)
 	m.On("Gauge", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	m.On("Timing", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
