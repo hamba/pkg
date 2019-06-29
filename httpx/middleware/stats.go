@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/hamba/pkg/stats"
+	"github.com/hamba/timex/mono"
 )
 
 // TagsFunc returns a set of tags from a request
@@ -30,17 +31,20 @@ func WithRequestStats(h http.Handler, sable stats.Statable, fns ...TagsFunc) htt
 			tags = append(tags, fn(r)...)
 		}
 
+		stats.Inc(sable, "request.in_flight", 1, 1.0, tags...)
+
 		rw := NewResponseWriter(w)
 
-		stats.Inc(sable, "request.start", 1, 1.0, tags...)
-
-		t := stats.Time(sable, "request.time", 1.0, tags...)
-
+		start := mono.Now()
 		h.ServeHTTP(rw, r)
+		dur := mono.Since(start)
 
-		t.Done()
+		stats.Inc(sable, "request.in_flight", -1, 1.0, tags...)
 
-		tags = append(tags, "status", strconv.Itoa(rw.Status()))
-		stats.Inc(sable, "request.complete", 1, 1.0, tags...)
+		status := strconv.Itoa(rw.Status())
+		tags = append(tags, "status", status, "status-group", string(status[0])+"xx")
+		stats.Timing(sable, "request.time", dur, 1.0, tags...)
+		stats.Inc(sable, "request.count", 1, 1.0, tags...)
+		stats.Inc(sable, "request.size", rw.BytesWritten(), 1.0, tags...)
 	})
 }
