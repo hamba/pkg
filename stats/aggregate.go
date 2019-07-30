@@ -239,7 +239,7 @@ func (s *AggregateStatter) Timing(name string, value time.Duration, rate float32
 }
 
 func (s *AggregateStatter) hash(name string, tags []string) string {
-	tg := make([]string, len(tags)+1)
+	tg := make([]string, len(tags), len(tags)+1)
 	copy(tg, tags)
 	sort.Strings(tg)
 	tg = append(tg, name)
