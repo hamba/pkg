@@ -10,7 +10,7 @@ import (
 // DefaultStatsPath is the default HTTP path for collecting metrics.
 var DefaultStatsPath = "/metrics"
 
-// Stats represents a statter that can expose stats for collection.
+// StatsHandler represents a statter that can expose stats for collection.
 type StatsHandler interface {
 	Handler() http.Handler
 }
