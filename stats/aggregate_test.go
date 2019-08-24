@@ -14,6 +14,7 @@ func TestNewAggregateStatter(t *testing.T) {
 	s := stats.NewAggregateStatter(m, time.Second)
 
 	assert.Implements(t, (*stats.Statter)(nil), s)
+	assert.Implements(t, (*stats.Wrapper)(nil), s)
 	assert.IsType(t, &stats.AggregateStatter{}, s)
 }
 
@@ -124,6 +125,15 @@ func TestAggregateStatter_Timing(t *testing.T) {
 	_ = s.Close()
 
 	m.AssertExpectations(t)
+}
+
+func TestAggregateStatter_Unwrap(t *testing.T) {
+	m := new(MockStats)
+	s := stats.NewAggregateStatter(m, time.Millisecond)
+
+	got := s.Unwrap()
+
+	assert.Equal(t, m, got)
 }
 
 func TestAggregateStatter_Close(t *testing.T) {

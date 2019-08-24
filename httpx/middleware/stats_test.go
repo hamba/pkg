@@ -37,10 +37,9 @@ func TestWithRequestStats(t *testing.T) {
 			newTags := append(tt.wantTags, "status", "200", "status-group", "2xx")
 
 			s := new(MockStats)
-			s.On("Inc", "request.in_flight", int64(1), float32(1.0), tt.wantTags)
-			s.On("Inc", "request.in_flight", int64(-1), float32(1.0), tt.wantTags)
+			s.On("Inc", "request.start", int64(1), float32(1.0), tt.wantTags)
 			s.On("Timing", "request.time", mock.Anything, float32(1.0), newTags)
-			s.On("Inc", "request.count", int64(1), float32(1.0), newTags)
+			s.On("Inc", "request.complete", int64(1), float32(1.0), newTags)
 			s.On("Inc", "request.size", int64(0), float32(1.0), newTags)
 
 			m := middleware.WithRequestStats(http.HandlerFunc(

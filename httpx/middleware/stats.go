@@ -31,7 +31,7 @@ func WithRequestStats(h http.Handler, sable stats.Statable, fns ...TagsFunc) htt
 			tags = append(tags, fn(r)...)
 		}
 
-		stats.Inc(sable, "request.in_flight", 1, 1.0, tags...)
+		stats.Inc(sable, "request.start", 1, 1.0, tags...)
 
 		rw := NewResponseWriter(w)
 
@@ -39,12 +39,10 @@ func WithRequestStats(h http.Handler, sable stats.Statable, fns ...TagsFunc) htt
 		h.ServeHTTP(rw, r)
 		dur := mono.Since(start)
 
-		stats.Inc(sable, "request.in_flight", -1, 1.0, tags...)
-
 		status := strconv.Itoa(rw.Status())
 		tags = append(tags, "status", status, "status-group", string(status[0])+"xx")
 		stats.Timing(sable, "request.time", dur, 1.0, tags...)
-		stats.Inc(sable, "request.count", 1, 1.0, tags...)
+		stats.Inc(sable, "request.complete", 1, 1.0, tags...)
 		stats.Inc(sable, "request.size", rw.BytesWritten(), 1.0, tags...)
 	})
 }

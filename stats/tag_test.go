@@ -14,6 +14,7 @@ func TestNewTaggedStatter(t *testing.T) {
 	s := stats.NewTaggedStatter(m, "global", "foobar")
 
 	assert.Implements(t, (*stats.Statter)(nil), s)
+	assert.Implements(t, (*stats.Wrapper)(nil), s)
 	assert.IsType(t, &stats.TaggedStatter{}, s)
 }
 
@@ -68,6 +69,15 @@ func TestTaggedStatter_Timing(t *testing.T) {
 	s.Timing("test", time.Millisecond, 1.0, "foo", "bar")
 
 	m.AssertExpectations(t)
+}
+
+func TestTaggedStatter_Unwrap(t *testing.T) {
+	m := new(MockStats)
+	s := stats.NewTaggedStatter(m, "global", "foobar")
+
+	got := s.Unwrap()
+
+	assert.Equal(t, m, got)
 }
 
 func TestTaggedStatter_Close(t *testing.T) {
