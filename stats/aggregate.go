@@ -246,6 +246,11 @@ func (s *AggregateStatter) hash(name string, tags []string) string {
 	return strings.Join(tg, "")
 }
 
+// Unwrap returns the underlying statter.
+func (s *AggregateStatter) Unwrap() Statter {
+	return s.stats
+}
+
 // Close closes the client and flushes aggregated stats.
 func (s *AggregateStatter) Close() error {
 	close(s.ch)
