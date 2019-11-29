@@ -1,6 +1,8 @@
 /*
 Package httptest provides utilities for HTTP testing.
 
+Deprecated: Use github.com/hamba/testutils instead.
+
 Example Server Usage:
 
 	import (
