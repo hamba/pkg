@@ -7,7 +7,7 @@ require (
 	github.com/go-zoo/bone v1.3.0
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/hamba/statter v1.2.0 // indirect
-	github.com/hamba/timex v1.0.0
+	github.com/hamba/timex v1.0.1
 	github.com/json-iterator/go v1.1.7
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
