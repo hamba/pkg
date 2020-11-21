@@ -3,7 +3,7 @@ package httpx
 import (
 	"net/http"
 
-	"github.com/json-iterator/go"
+	jsoniter "github.com/json-iterator/go"
 )
 
 const (

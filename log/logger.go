@@ -6,12 +6,6 @@ import (
 	"os"
 )
 
-type key int
-
-const (
-	ctxKey key = iota
-)
-
 var (
 	// Null is the null Logger instance.
 	Null = &nullLogger{}

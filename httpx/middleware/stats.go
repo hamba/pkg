@@ -8,7 +8,7 @@ import (
 	"github.com/hamba/timex/mono"
 )
 
-// TagsFunc returns a set of tags from a request
+// TagsFunc returns a set of tags from a request.
 type TagsFunc func(*http.Request) []string
 
 // DefaultTags extracts the method and path from the request.

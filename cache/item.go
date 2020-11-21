@@ -10,7 +10,7 @@ type Decoder interface {
 	String(interface{}) (string, error)
 }
 
-// Item represents an item to be returned or stored in the cache
+// Item represents an item to be returned or stored in the cache.
 type Item struct {
 	dec   Decoder
 	Value interface{}
