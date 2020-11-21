@@ -24,6 +24,7 @@ func ExponentialPolicy(attempts int, sleep time.Duration) Policy {
 	}
 }
 
+// Next returns the next wait time or false.
 func (p *exponentialPolicy) Next() (time.Duration, bool) {
 	p.attempts--
 	if p.attempts <= 0 {
@@ -37,7 +38,7 @@ func (p *exponentialPolicy) Next() (time.Duration, bool) {
 	return p.sleep, true
 }
 
-// Run executes the function while the Policy allows
+// Run executes the function while the Policy allows.
 // until it returns nil or Stop.
 func Run(p Policy, fn func() error) error {
 	if p == nil {
@@ -45,14 +46,15 @@ func Run(p Policy, fn func() error) error {
 	}
 
 	if err := fn(); err != nil {
-		if s, ok := err.(stop); ok {
+		s := stop{}
+		if errors.As(err, &s) {
 			return s.error
 		}
 
 		if sleep, ok := p.Next(); ok {
 			time.Sleep(sleep)
 
-			Run(p, fn)
+			_ = Run(p, fn)
 		}
 
 		return err

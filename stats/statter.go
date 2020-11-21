@@ -5,12 +5,6 @@ import (
 	"time"
 )
 
-type key int
-
-const (
-	ctxKey key = iota
-)
-
 var (
 	// Null is the null Statter instance.
 	Null = &nullStatter{}
@@ -50,7 +44,7 @@ func Timing(sable Statable, name string, value time.Duration, rate float32, tags
 	sable.Statter().Timing(name, value, rate, tags...)
 }
 
-// Close closes the client and flushes buffered stats, if applicable
+// Close closes the client and flushes buffered stats, if applicable.
 func Close(sable Statable) error {
 	return sable.Statter().Close()
 }

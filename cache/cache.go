@@ -5,12 +5,6 @@ import (
 	"time"
 )
 
-type key int
-
-const (
-	ctxKey key = iota
-)
-
 var (
 	// ErrCacheMiss is returned if a Get failed because the item wasn't present.
 	ErrCacheMiss = errors.New("cache: miss")
