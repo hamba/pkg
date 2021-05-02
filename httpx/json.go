@@ -6,13 +6,11 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-const (
-	// JSONContentType represents MIME type for JSON content.
-	JSONContentType = "application/json"
-)
+// JSONContentType represents MIME type for JSON content.
+const JSONContentType = "application/json"
 
-// WriteJSONResponse encodes json content to the ResponseWriter.
-func WriteJSONResponse(w http.ResponseWriter, code int, v interface{}) error {
+// JSON encodes json content to the ResponseWriter.
+func JSON(w http.ResponseWriter, code int, v interface{}) error {
 	raw, err := jsoniter.Marshal(v)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

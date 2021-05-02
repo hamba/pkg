@@ -10,34 +10,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewHealthMux_Healthy(t *testing.T) {
-	mux := httpx.NewHealthMux(&healthy{})
+func TestNewHealthHandler(t *testing.T) {
+	tests := []struct {
+		name     string
+		err      error
+		wantCode int
+	}{
+		{
+			name:     "healthy",
+			wantCode: http.StatusOK,
+		},
+		{
+			name:     "unhealthy",
+			err:      errors.New("test"),
+			wantCode: http.StatusInternalServerError,
+		},
+	}
 
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/health", nil)
-	mux.ServeHTTP(w, req)
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-	assert.Equal(t, http.StatusOK, w.Code)
+			m := &testHealth{err: test.err}
+			h := httpx.NewHealthHandler(m)
+
+			w := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", "/health", nil)
+			h.ServeHTTP(w, req)
+
+			assert.Equal(t, test.wantCode, w.Code)
+		})
+	}
 }
 
-func TestNewHealthMux_Unhealthy(t *testing.T) {
-	mux := httpx.NewHealthMux(&unhealthy{})
-
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/health", nil)
-	mux.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+type testHealth struct {
+	err error
 }
 
-type healthy struct{}
-
-func (h *healthy) IsHealthy() error {
-	return nil
-}
-
-type unhealthy struct{}
-
-func (h *unhealthy) IsHealthy() error {
-	return errors.New("test error")
+func (h *testHealth) IsHealthy() error {
+	return h.err
 }

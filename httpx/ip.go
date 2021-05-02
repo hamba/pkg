@@ -20,8 +20,7 @@ func RealIP(r *http.Request) string {
 	}
 
 	if len(hdrForwardedFor) > 0 {
-		pieces := strings.Split(hdrForwardedFor, ",")
-		return pieces[0]
+		return strings.Split(hdrForwardedFor, ",")[0]
 	}
 
 	return hdrRealIP
