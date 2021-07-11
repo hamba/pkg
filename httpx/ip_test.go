@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/hamba/pkg/httpx"
+	"github.com/hamba/pkg/v2/httpx"
 	"github.com/stretchr/testify/assert"
 )
 
