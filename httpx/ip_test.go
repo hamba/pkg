@@ -10,44 +10,56 @@ import (
 
 func TestRealIP(t *testing.T) {
 	tests := []struct {
-		req *http.Request
-		ip  string
+		name string
+		req  *http.Request
+		want string
 	}{
 		{
-			&http.Request{RemoteAddr: "127.0.0.1"},
-			"127.0.0.1",
+			name: "remote addr without port",
+			req:  &http.Request{RemoteAddr: "127.0.0.1"},
+			want: "127.0.0.1",
 		},
 		{
-			&http.Request{RemoteAddr: "127.0.0.1:8888"},
-			"127.0.0.1",
+			name: "remote addr with port",
+			req:  &http.Request{RemoteAddr: "127.0.0.1:8888"},
+			want: "127.0.0.1",
 		},
 		{
-			&http.Request{
+			name: "real-ip",
+			req: &http.Request{
 				RemoteAddr: "127.0.0.1",
 				Header:     http.Header{http.CanonicalHeaderKey("X-Real-Ip"): []string{"1.2.3.4"}},
 			},
-			"1.2.3.4",
+			want: "1.2.3.4",
 		},
 		{
-			&http.Request{
+			name: "forwarded for",
+			req: &http.Request{
 				RemoteAddr: "127.0.0.1",
-				Header:     http.Header{http.CanonicalHeaderKey("X-Forwarded-For"): []string{"1.2.3.4"}},
+				Header:     http.Header{http.CanonicalHeaderKey("X-Forwarded-For"): []string{"1.2.3.4", "127.0.0.1"}},
 			},
-			"1.2.3.4",
+			want: "1.2.3.4",
 		},
 		{
-			&http.Request{
+			name: "forwarded for over real ip",
+			req: &http.Request{
 				RemoteAddr: "127.0.0.1",
 				Header: http.Header{
-					http.CanonicalHeaderKey("X-Forwarded-For"): []string{"1.2.3.4"},
+					http.CanonicalHeaderKey("X-Forwarded-For"): []string{"1.2.3.4", "11.0.0.1"},
 					http.CanonicalHeaderKey("X-Real-Ip"):       []string{"5.6.7.8"}},
 			},
-			"1.2.3.4",
+			want: "1.2.3.4",
 		},
 	}
 
-	for _, tt := range tests {
-		got := httpx.RealIP(tt.req)
-		assert.Equal(t, tt.ip, got)
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := httpx.RealIP(test.req)
+
+			assert.Equal(t, test.want, got)
+		})
 	}
 }

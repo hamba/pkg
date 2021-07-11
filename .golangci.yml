@@ -1,24 +1,34 @@
 run:
   tests: false
   timeout: 5m
+
+linters-settings:
+  cyclop:
+    max-complexity: 12
+    skip-tests: true
+  funlen:
+    lines: 80
+  gofumpt:
+    extra-rules: true
+
 linters:
   enable-all: true
   disable:
+    - interfacer # deprecated
+    - scopelint # deprecated
+    - maligned # deprecated
+    - golint # deprecated
     - exhaustive
     - exhaustivestruct
+    - forcetypeassert
     - funlen
     - gochecknoglobals
     - gochecknoinits
-    - gocognit
-    - gocyclo
     - goerr113
     - gomnd
-    - interfacer
-    - nestif
-    - noctx
     - nlreturn
-    - scopelint
     - wrapcheck
     - wsl
-    - gofumpt
-    - godox
+
+issues:
+  exclude-use-default: false

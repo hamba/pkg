@@ -7,66 +7,64 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestWriteJSONResponse(t *testing.T) {
+func TestJSON(t *testing.T) {
 	tests := []struct {
-		code         int
-		data         interface{}
-		expectedJSON string
-		expectedErr  bool
+		name     string
+		code     int
+		data     interface{}
+		wantJSON string
+		wantErr  require.ErrorAssertionFunc
 	}{
 		{
-			200,
-			struct {
+			name: "encodes JSON",
+			code: http.StatusOK,
+			data: struct {
 				Foo string
 				Bar string
 			}{"foo", "bar"},
-			`{"Foo":"foo","Bar":"bar"}`,
-			false,
+			wantJSON: `{"Foo":"foo","Bar":"bar"}`,
+			wantErr:  require.NoError,
 		},
 		{
-			500,
-			make(chan int),
-			"",
-			true,
+			name:    "handles bad data",
+			code:    http.StatusInternalServerError,
+			data:    make(chan int),
+			wantErr: require.Error,
 		},
 	}
 
 	for _, test := range tests {
-		w := httptest.NewRecorder()
-		err := WriteJSONResponse(w, test.code, test.data)
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
 
-		assert.Equal(t, test.code, w.Code)
-		assert.Equal(t, test.expectedJSON, string(w.Body.Bytes()))
-		if test.expectedErr {
-			assert.Error(t, err)
-			continue
+			w := httptest.NewRecorder()
+			err := JSON(w, test.code, test.data)
 
-		}
-		assert.NoError(t, err)
-		assert.Equal(t, JSONContentType, w.Header().Get("Content-Type"))
+			test.wantErr(t, err)
+			assert.Equal(t, test.code, w.Code)
+			assert.Equal(t, test.wantJSON, string(w.Body.Bytes()))
+
+			if test.code/100 == 2 {
+				assert.Equal(t, JSONContentType, w.Header().Get("Content-Type"))
+			}
+		})
 	}
 }
 
-func TestWriteJSONResponse_WriteError(t *testing.T) {
-	w := FakeResponseWriter{}
+func TestJSON_WriteError(t *testing.T) {
+	w := testResponseWriter{}
 
-	err := WriteJSONResponse(w, 200, "test")
+	err := JSON(w, 200, "test")
 
 	assert.Error(t, err)
 }
 
-type FakeResponseWriter struct{}
+type testResponseWriter struct{}
 
-func (rw FakeResponseWriter) Header() http.Header {
-	return http.Header{}
-}
-
-func (rw FakeResponseWriter) Write([]byte) (int, error) {
-	return 0, errors.New("test error")
-}
-
-func (rw FakeResponseWriter) WriteHeader(int) {
-
-}
+func (rw testResponseWriter) Header() http.Header       { return http.Header{} }
+func (rw testResponseWriter) Write([]byte) (int, error) { return 0, errors.New("test error") }
+func (rw testResponseWriter) WriteHeader(int)           {}
