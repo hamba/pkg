@@ -3,7 +3,7 @@ package ptr_test
 import (
 	"testing"
 
-	"github.com/hamba/pkg/ptr"
+	"github.com/hamba/pkg/v2/ptr"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,4 +1,4 @@
-module github.com/hamba/pkg
+module github.com/hamba/pkg/v2
 
 go 1.14
 
