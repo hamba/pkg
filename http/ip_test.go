@@ -1,10 +1,10 @@
-package httpx_test
+package http_test
 
 import (
 	"net/http"
 	"testing"
 
-	"github.com/hamba/pkg/v2/httpx"
+	httpx "github.com/hamba/pkg/v2/http"
 	"github.com/stretchr/testify/assert"
 )
 

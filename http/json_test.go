@@ -1,4 +1,4 @@
-package httpx
+package http_test
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	httpx "github.com/hamba/pkg/v2/http"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -42,14 +43,14 @@ func TestJSON(t *testing.T) {
 			t.Parallel()
 
 			w := httptest.NewRecorder()
-			err := JSON(w, test.code, test.data)
+			err := httpx.JSON(w, test.code, test.data)
 
 			test.wantErr(t, err)
 			assert.Equal(t, test.code, w.Code)
 			assert.Equal(t, test.wantJSON, string(w.Body.Bytes()))
 
 			if test.code/100 == 2 {
-				assert.Equal(t, JSONContentType, w.Header().Get("Content-Type"))
+				assert.Equal(t, httpx.JSONContentType, w.Header().Get("Content-Type"))
 			}
 		})
 	}
@@ -58,7 +59,7 @@ func TestJSON(t *testing.T) {
 func TestJSON_WriteError(t *testing.T) {
 	w := testResponseWriter{}
 
-	err := JSON(w, 200, "test")
+	err := httpx.JSON(w, 200, "test")
 
 	assert.Error(t, err)
 }
