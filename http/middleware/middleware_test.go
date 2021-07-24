@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/hamba/logger/v2"
-	"github.com/hamba/pkg/v2/httpx/middleware"
+	"github.com/hamba/pkg/v2/http/middleware"
 	"github.com/hamba/statter/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

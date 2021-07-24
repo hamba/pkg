@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hamba/pkg/v2/httpx/middleware"
+	"github.com/hamba/pkg/v2/http/middleware"
 	"github.com/hamba/statter/v2"
 )
 
