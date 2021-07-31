@@ -7,6 +7,9 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 // SrvOptFunc represents a server option function.
@@ -16,6 +19,17 @@ type SrvOptFunc func(*http.Server)
 func WithTLSConfig(cfg *tls.Config) SrvOptFunc {
 	return func(srv *http.Server) {
 		srv.TLSConfig = cfg
+	}
+}
+
+// WithH2C allows the server to handle h2c connections.
+func WithH2C() SrvOptFunc {
+	return func(srv *http.Server) {
+		h2s := &http2.Server{
+			IdleTimeout: 120 * time.Second,
+		}
+
+		srv.Handler = h2c.NewHandler(srv.Handler, h2s)
 	}
 }
 
