@@ -44,8 +44,8 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/hamba/logger/v2 v2.3.0 h1:W20zm1RtimPI6LCKUcbmKDsTats1j14E/lI6XHYurRQ=
 github.com/hamba/logger/v2 v2.3.0/go.mod h1:z66imz0yn2+Kfv4bDfgBijxJH/sMUEVwNg/KwvOJbyQ=
-github.com/hamba/statter/v2 v2.1.1 h1:dTivCmWEUFZA7Z36sXJGAIup9mKg3hYFC5NaykSmvCk=
-github.com/hamba/statter/v2 v2.1.1/go.mod h1:JKqf/MG5wwc3nnXeDmy2CSHR9BkaU+7nGa4FDrdGKow=
+github.com/hamba/statter/v2 v2.1.2 h1:eswK3lTi3l0LwiF5j38dgo67cNdlcVFwEdK/oEfrH3M=
+github.com/hamba/statter/v2 v2.1.2/go.mod h1:JKqf/MG5wwc3nnXeDmy2CSHR9BkaU+7nGa4FDrdGKow=
 github.com/hamba/timex v1.1.0 h1:FRp5HDFY+2Z2O5eKZ1XAr2zbuZTOIjl4i86y0BX8SyA=
 github.com/hamba/timex v1.1.0/go.mod h1:gGOPb5kMDgX6ml27BWmS7psaG1MzQhH31FeJiDmP+7c=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
