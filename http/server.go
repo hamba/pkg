@@ -22,6 +22,20 @@ func WithTLSConfig(cfg *tls.Config) SrvOptFunc {
 	}
 }
 
+// WithReadTimeout sets the server read timeout.
+func WithReadTimeout(d time.Duration) SrvOptFunc {
+	return func(srv *http.Server) {
+		srv.ReadTimeout = d
+	}
+}
+
+// WithWriteTimeout sets the server write timeout.
+func WithWriteTimeout(d time.Duration) SrvOptFunc {
+	return func(srv *http.Server) {
+		srv.WriteTimeout = d
+	}
+}
+
 // WithH2C allows the server to handle h2c connections.
 func WithH2C() SrvOptFunc {
 	return func(srv *http.Server) {
