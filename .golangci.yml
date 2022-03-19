@@ -27,6 +27,7 @@ linters:
     - goerr113
     - gomnd
     - nlreturn
+    - varnamelen
     - wrapcheck
     - wsl
 
