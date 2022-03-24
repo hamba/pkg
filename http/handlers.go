@@ -1,8 +1,13 @@
 package http
 
-import (
-	"net/http"
-)
+import "net/http"
+
+// OK replies to the request with an HTTP 200 ok reply.
+func OK(rw http.ResponseWriter, _ *http.Request) { rw.WriteHeader(http.StatusOK) }
+
+// OKHandler returns a simple request handler
+// that replies to each request with a ``200 OK'' reply.
+func OKHandler() http.Handler { return http.HandlerFunc(OK) }
 
 // DefaultHealthPath is the default HTTP path for checking health.
 var DefaultHealthPath = "/health"

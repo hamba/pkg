@@ -31,6 +31,13 @@ func WithRecovery(h http.Handler, log *logger.Logger) http.Handler {
 	})
 }
 
+// Recovery is a wrapper for WithRecovery.
+func Recovery(log *logger.Logger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return WithRecovery(next, log)
+	}
+}
+
 // WithStats collects statistics about HTTP requests.
 func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -53,6 +60,13 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 		s.Histogram("response.size", t...).Observe(float64(wrap.BytesWritten()))
 		s.Timing("response.duration", t...).Observe(dur)
 	})
+}
+
+// Stats is a wrapper for WithStats.
+func Stats(name string, s *statter.Statter) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return WithStats(name, s, next)
+	}
 }
 
 type responseWrapper struct {
