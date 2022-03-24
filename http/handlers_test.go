@@ -10,6 +10,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestOKHandler(t *testing.T) {
+	h := httpx.OKHandler()
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/something", nil)
+	h.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
 func TestNewHealthHandler(t *testing.T) {
 	tests := []struct {
 		name     string
