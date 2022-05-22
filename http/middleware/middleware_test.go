@@ -11,6 +11,7 @@ import (
 	"github.com/hamba/logger/v2"
 	"github.com/hamba/pkg/v2/http/middleware"
 	"github.com/hamba/statter/v2"
+	"github.com/hamba/statter/v2/reporter/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -113,6 +114,25 @@ func TestWithStats(t *testing.T) {
 			m.AssertExpectations(t)
 		})
 	}
+}
+
+func TestWithStats_Prometheus(t *testing.T) {
+	reporter := prometheus.New("test")
+	s := statter.New(reporter, time.Second)
+
+	h := middleware.WithStats("test-handler", s, http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(305)
+		}),
+	)
+
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/foobar", nil)
+
+	h.ServeHTTP(resp, req)
+
+	err := s.Close()
+	require.NoError(t, err)
 }
 
 type mockReporter struct {

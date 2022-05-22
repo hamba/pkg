@@ -7,6 +7,7 @@ import (
 	"github.com/hamba/logger/v2"
 	"github.com/hamba/logger/v2/ctx"
 	"github.com/hamba/statter/v2"
+	"github.com/hamba/statter/v2/reporter/prometheus"
 	"github.com/hamba/statter/v2/tags"
 	"github.com/hamba/timex/mono"
 )
@@ -40,6 +41,13 @@ func Recovery(log *logger.Logger) func(http.Handler) http.Handler {
 
 // WithStats collects statistics about HTTP requests.
 func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
+	prometheus.RegisterHistogram(s,
+		"response.size",
+		[]string{"handler", "code"},
+		[]float64{200, 500, 900, 1500, 5000, 10000},
+		"The size of a response in bytes",
+	)
+
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		t := make([]statter.Tag, 1, 2)
 		if name == "" {
