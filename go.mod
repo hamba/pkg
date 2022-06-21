@@ -7,6 +7,6 @@ require (
 	github.com/hamba/statter/v2 v2.3.0
 	github.com/hamba/timex v1.1.0
 	github.com/json-iterator/go v1.1.12
-	github.com/stretchr/testify v1.7.3
+	github.com/stretchr/testify v1.7.4
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
 )
