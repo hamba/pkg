@@ -59,11 +59,12 @@ func NewServer(ctx context.Context, addr string, h http.Handler, opts ...SrvOptF
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
-		Addr:         addr,
-		Handler:      h,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		Addr:              addr,
+		Handler:           h,
+		ReadHeaderTimeout: time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
 
 	for _, opt := range opts {
