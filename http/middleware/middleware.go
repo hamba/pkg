@@ -113,3 +113,10 @@ func (rw *responseWrapper) Status() int {
 func (rw *responseWrapper) BytesWritten() int64 {
 	return rw.bytes
 }
+
+// Unwrap returns the underlying response writer.
+// This is used by http.ResponseController to find the first
+// response writer that implements an interface.
+func (rw *responseWrapper) Unwrap() http.ResponseWriter {
+	return rw.ResponseWriter
+}

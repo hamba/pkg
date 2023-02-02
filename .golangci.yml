@@ -18,8 +18,13 @@ linters:
     - scopelint # deprecated
     - maligned # deprecated
     - golint # deprecated
+    - nosnakecase # deprecated
+    - ifshort # deprecated
+    - deadcode # deprecated
+    - structcheck # deprecated
+    - varcheck # deprecated
+    - exhaustivestruct # deprecated
     - exhaustive
-    - exhaustivestruct
     - exhaustruct
     - forcetypeassert
     - funlen
