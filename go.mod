@@ -10,6 +10,6 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/prometheus/common v0.40.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	golang.org/x/net v0.8.0
 )
