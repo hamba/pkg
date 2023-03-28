@@ -38,6 +38,8 @@ func TestWithRecovery(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
 			buf := bytes.Buffer{}
 			log := logger.New(&buf, logger.LogfmtFormat(), logger.Info)
 
@@ -88,6 +90,8 @@ func TestWithStats(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
 			m := &mockReporter{}
 			m.On("Counter", "requests", int64(1), test.wantTags)
 			wantTags := append([][2]string{{"code", "3xx"}}, test.wantTags...)
