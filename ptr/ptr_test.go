@@ -7,6 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestOf(t *testing.T) {
+	want := true
+
+	got := ptr.Of(want)
+
+	assert.Exactly(t, &want, got)
+}
+
 func TestBool(t *testing.T) {
 	want := true
 

@@ -48,7 +48,7 @@ func WithH2C() SrvOptFunc {
 }
 
 // Server is a convenience wrapper around the standard
-// library http server.
+// library HTTP server.
 type Server struct {
 	srv *http.Server
 }
@@ -76,7 +76,7 @@ func NewServer(ctx context.Context, addr string, h http.Handler, opts ...SrvOptF
 	}
 }
 
-// Serve starts the server in a in-blocking way.
+// Serve starts the server in a non-blocking way.
 func (s *Server) Serve(errFn func(error)) {
 	go func() {
 		if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {

@@ -17,7 +17,7 @@ import (
 
 func TestServer(t *testing.T) {
 	var handlerCalled bool
-	h := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	h := http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
 		handlerCalled = true
 	})
 
@@ -45,7 +45,7 @@ func TestServer(t *testing.T) {
 
 func TestServer_WithH2C(t *testing.T) {
 	var handlerCalled bool
-	h := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	h := http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
 		assert.True(t, req.ProtoAtLeast(2, 0))
 
 		handlerCalled = true
@@ -62,7 +62,7 @@ func TestServer_WithH2C(t *testing.T) {
 	c := &http.Client{
 		Transport: &http2.Transport{
 			AllowHTTP: true,
-			DialTLS: func(network, addr string, cfg *tls.Config) (net.Conn, error) {
+			DialTLSContext: func(_ context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
 				return net.Dial(network, addr)
 			},
 		},
