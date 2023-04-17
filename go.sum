@@ -133,8 +133,8 @@ github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/hamba/logger/v2 v2.4.0 h1:FvyTY3+TaBRXyjbZVWjfp11aEFtmDuj61amtq3uewns=
 github.com/hamba/logger/v2 v2.4.0/go.mod h1:GDGHloIMf5JUwYjBPjgLmodnP21IJn5TrGhwRK52EfE=
-github.com/hamba/statter/v2 v2.3.2 h1:VKUzx+eRS6bZOiCVUummILB6Zh+hBaUA8NTk2QXW0zI=
-github.com/hamba/statter/v2 v2.3.2/go.mod h1:g4pLzCbbhP0x6NcXAYkgViTiREAKj6UFQJOYxI25Smw=
+github.com/hamba/statter/v2 v2.3.3 h1:Xokqez+TK7X977JbdzOFfv6mc9TX/0Gub+LQccwdIMI=
+github.com/hamba/statter/v2 v2.3.3/go.mod h1:g4pLzCbbhP0x6NcXAYkgViTiREAKj6UFQJOYxI25Smw=
 github.com/hamba/timex v1.1.0 h1:FRp5HDFY+2Z2O5eKZ1XAr2zbuZTOIjl4i86y0BX8SyA=
 github.com/hamba/timex v1.1.0/go.mod h1:gGOPb5kMDgX6ml27BWmS7psaG1MzQhH31FeJiDmP+7c=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
