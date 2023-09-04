@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/hamba/logger/v2 v2.5.0
-	github.com/hamba/statter/v2 v2.3.3
+	github.com/hamba/statter/v2 v2.3.4
 	github.com/hamba/timex v1.1.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.4
@@ -21,10 +21,10 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.14.0 // indirect
+	github.com/prometheus/client_golang v1.16.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
-	github.com/prometheus/procfs v0.9.0 // indirect
+	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/valyala/fastrand v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.17.0 // indirect
