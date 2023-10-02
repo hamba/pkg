@@ -8,6 +8,7 @@ require (
 	github.com/hamba/timex v1.1.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.4
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.45.0
 	golang.org/x/net v0.15.0
 )
 
@@ -15,6 +16,9 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/felixge/httpsnoop v1.0.3 // indirect
+	github.com/go-logr/logr v1.2.4 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
@@ -27,8 +31,9 @@ require (
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/valyala/fastrand v1.1.0 // indirect
-	go.opentelemetry.io/otel v1.17.0 // indirect
-	go.opentelemetry.io/otel/trace v1.17.0 // indirect
+	go.opentelemetry.io/otel v1.19.0 // indirect
+	go.opentelemetry.io/otel/metric v1.19.0 // indirect
+	go.opentelemetry.io/otel/trace v1.19.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect

@@ -1,4 +1,4 @@
-// Package middleware implements reusable HTTP middleware.
+// Package middleware provides reusable HTTP middleware.
 package middleware
 
 import (
@@ -10,6 +10,7 @@ import (
 	"github.com/hamba/statter/v2/reporter/prometheus"
 	"github.com/hamba/statter/v2/tags"
 	"github.com/hamba/timex/mono"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // WithRecovery recovers from panics and log the error.
@@ -74,6 +75,13 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 func Stats(name string, s *statter.Statter) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return WithStats(name, s, next)
+	}
+}
+
+// Tracing collects traces on HTTP requests.
+func Tracing(op string, opts ...otelhttp.Option) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return otelhttp.NewHandler(next, op, opts...)
 	}
 }
 

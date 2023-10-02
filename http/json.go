@@ -10,6 +10,8 @@ import (
 const JSONContentType = "application/json"
 
 // JSON encodes json content to the ResponseWriter.
+//
+// Deprecated: Use the `http/render` package instead.
 func JSON(w http.ResponseWriter, code int, v interface{}) error {
 	raw, err := jsoniter.Marshal(v)
 	if err != nil {
