@@ -40,7 +40,7 @@ func TestPollUntil(t *testing.T) {
 	for range called {
 		calledCount++
 	}
-	assert.LessOrEqual(t, 1, calledCount)
+	assert.LessOrEqual(t, calledCount, 1)
 }
 
 func TestPollUntil_HandlesError(t *testing.T) {
