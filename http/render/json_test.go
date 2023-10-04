@@ -15,7 +15,7 @@ func TestJSONInternalServerError(t *testing.T) {
 
 	render.JSONInternalServerError(rec)
 
-	want := `{"code":500,"reason":"internal server error"}`
+	want := `{"code":500,"error":"internal server error"}`
 	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 	assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
 	assert.Equal(t, want, rec.Body.String())
@@ -26,7 +26,7 @@ func TestJSONErrorf(t *testing.T) {
 
 	render.JSONErrorf(rec, http.StatusBadRequest, "test %s", "message")
 
-	want := `{"code":400,"reason":"test message"}`
+	want := `{"code":400,"error":"test message"}`
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
 	assert.Equal(t, want, rec.Body.String())
@@ -37,7 +37,7 @@ func TestJSONError(t *testing.T) {
 
 	render.JSONError(rec, http.StatusBadRequest, "test message")
 
-	want := `{"code":400,"reason":"test message"}`
+	want := `{"code":400,"error":"test message"}`
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	assert.Equal(t, "application/json", rec.Header().Get("Content-Type"))
 	assert.Equal(t, want, rec.Body.String())

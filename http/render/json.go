@@ -14,8 +14,11 @@ const JSONContentType = "application/json"
 
 // APIError contains error information that is rendered by JSONError.
 type APIError struct {
-	Code   int    `json:"code"`
-	Reason string `json:"reason"`
+	// Code is the http status code.
+	Code int `json:"code"`
+
+	// Error is the reason for the error.
+	Error string `json:"error"`
 }
 
 // JSONInternalServerError writes a JSON internal server error.
@@ -33,10 +36,10 @@ func JSONError(rw http.ResponseWriter, code int, reason string) {
 	rw.Header().Set("Content-Type", JSONContentType)
 	rw.WriteHeader(code)
 
-	apiErr := APIError{Code: code, Reason: reason}
+	apiErr := APIError{Code: code, Error: reason}
 	b, err := jsoniter.Marshal(apiErr)
 	if err != nil {
-		_, _ = rw.Write([]byte(`{"reason":"Internal Server Error"}`))
+		_, _ = rw.Write([]byte(`{"code":500,"error":"internal server error"}`))
 	}
 
 	_, _ = rw.Write(b)
