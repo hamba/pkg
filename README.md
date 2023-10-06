@@ -1,6 +1,6 @@
 ![Logo](http://svg.wiersma.co.za/hamba/project?title=pkg&tag=Go%20package%20collection)
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/hamba/pkg)](https://goreportcard.com/report/github.com/hamba/pkg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hamba/pkg/v2)](https://goreportcard.com/report/github.com/hamba/pkg)
 [![Build Status](https://github.com/hamba/pkg/actions/workflows/test.yml/badge.svg)](https://github.com/hamba/pkg/actions)
 [![Coverage Status](https://coveralls.io/repos/github/hamba/pkg/badge.svg?branch=master)](https://coveralls.io/github/hamba/pkg?branch=master)
 [![Go Reference](https://pkg.go.dev/badge/github.com/hamba/pkg/v2.svg)](https://pkg.go.dev/github.com/hamba/pkg/v2)
@@ -16,5 +16,3 @@ Install with:
 ```shell
 go get github.com/hamba/pkg
 ```
-
-**Note:** This project has renamed the default branch from `master` to `main`. You will need to update your local environment.
