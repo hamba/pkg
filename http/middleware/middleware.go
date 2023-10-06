@@ -6,10 +6,12 @@ import (
 
 	"github.com/hamba/logger/v2"
 	"github.com/hamba/logger/v2/ctx"
+	"github.com/hamba/pkg/v2/http/request"
 	"github.com/hamba/statter/v2"
 	"github.com/hamba/statter/v2/reporter/prometheus"
 	"github.com/hamba/statter/v2/tags"
 	"github.com/hamba/timex/mono"
+	"github.com/segmentio/ksuid"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -37,6 +39,25 @@ func WithRecovery(h http.Handler, log *logger.Logger) http.Handler {
 func Recovery(log *logger.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return WithRecovery(next, log)
+	}
+}
+
+// WithRequestID sets the request id on request context and in the response.
+func WithRequestID(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		id := ksuid.New().String()
+
+		rw.Header().Set("X-Request-ID", id)
+		req = req.WithContext(request.WithID(req.Context(), id))
+
+		h.ServeHTTP(rw, req)
+	})
+}
+
+// RequestID is a wrapper for WithRequestID.
+func RequestID() func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return WithRequestID(next)
 	}
 }
 

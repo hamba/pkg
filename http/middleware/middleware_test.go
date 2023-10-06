@@ -10,6 +10,7 @@ import (
 
 	"github.com/hamba/logger/v2"
 	"github.com/hamba/pkg/v2/http/middleware"
+	"github.com/hamba/pkg/v2/http/request"
 	"github.com/hamba/statter/v2"
 	"github.com/hamba/statter/v2/reporter/prometheus"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestWithRecovery(t *testing.T) {
+func TestRecovery(t *testing.T) {
 	tests := []struct {
 		name    string
 		val     interface{}
@@ -43,12 +44,9 @@ func TestWithRecovery(t *testing.T) {
 			buf := bytes.Buffer{}
 			log := logger.New(&buf, logger.LogfmtFormat(), logger.Info)
 
-			h := middleware.WithRecovery(
-				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					panic(test.val)
-				}),
-				log,
-			)
+			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				panic(test.val)
+			})
 
 			req, _ := http.NewRequest("GET", "/", nil)
 			resp := httptest.NewRecorder()
@@ -59,15 +57,34 @@ func TestWithRecovery(t *testing.T) {
 				}
 			}()
 
-			h.ServeHTTP(resp, req)
+			middleware.Recovery(log)(next).ServeHTTP(resp, req)
 
 			assert.Contains(t, buf.String(), test.wantLog)
 		})
 	}
-
 }
 
-func TestWithStats(t *testing.T) {
+func TestRequestID(t *testing.T) {
+	var nextCalled bool
+	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		nextCalled = true
+
+		got, ok := request.IDFrom(req.Context())
+
+		assert.True(t, ok)
+		assert.NotEmpty(t, got)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/some/thing", nil)
+	rec := httptest.NewRecorder()
+
+	middleware.RequestID()(next).ServeHTTP(rec, req)
+
+	assert.True(t, nextCalled)
+	assert.NotEmpty(t, rec.Header().Get("X-Request-ID"))
+}
+
+func TestStats(t *testing.T) {
 	tests := []struct {
 		name        string
 		handlerName string
@@ -101,16 +118,15 @@ func TestWithStats(t *testing.T) {
 
 			s := statter.New(m, time.Second)
 
-			h := middleware.WithStats(test.handlerName, s, http.HandlerFunc(
+			next := http.HandlerFunc(
 				func(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(305)
-				}),
-			)
+				})
 
 			resp := httptest.NewRecorder()
 			req, _ := http.NewRequest("GET", test.path, nil)
 
-			h.ServeHTTP(resp, req)
+			middleware.Stats(test.handlerName, s)(next).ServeHTTP(resp, req)
 
 			err := s.Close()
 			require.NoError(t, err)
