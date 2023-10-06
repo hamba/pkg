@@ -50,7 +50,7 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 	)
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		t := make([]statter.Tag, 1, 2)
+		t := make([]statter.Tag, 1, 3)
 		if name == "" {
 			name = req.URL.Path
 		}
@@ -64,7 +64,8 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 		h.ServeHTTP(wrap, req)
 		dur := mono.Since(start)
 
-		t = append(t, tags.StatusCode("code", wrap.Status()))
+		t = append(t, tags.StatusCode("status-group", wrap.Status()))
+		t = append(t, tags.Int("status-code", wrap.Status()))
 		s.Counter("responses", t...).Inc(1)
 		s.Histogram("response.size", t...).Observe(float64(wrap.BytesWritten()))
 		s.Timing("response.duration", t...).Observe(dur)

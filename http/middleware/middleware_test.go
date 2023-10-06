@@ -94,7 +94,7 @@ func TestWithStats(t *testing.T) {
 
 			m := &mockReporter{}
 			m.On("Counter", "requests", int64(1), test.wantTags)
-			wantTags := append([][2]string{{"code", "3xx"}}, test.wantTags...)
+			wantTags := append(test.wantTags, [][2]string{{"status-code", "305"}, {"status-group", "3xx"}}...)
 			m.On("Counter", "responses", int64(1), wantTags)
 			m.On("Histogram", "response.size", wantTags).Return(func(_ float64) {})
 			m.On("Timing", "response.duration", wantTags).Return(func(_ time.Duration) {})
