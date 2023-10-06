@@ -1,3 +1,5 @@
+// Package request provides functions add and extract information from an
+// http request.
 package request
 
 import "context"

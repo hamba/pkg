@@ -56,9 +56,7 @@ func WithRequestID(h http.Handler) http.Handler {
 
 // RequestID is a wrapper for WithRequestID.
 func RequestID() func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return WithRequestID(next)
-	}
+	return WithRequestID
 }
 
 // WithStats collects statistics about HTTP requests.
