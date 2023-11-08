@@ -4,10 +4,18 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
+	"strings"
+	"sync"
 	"time"
 
+	"github.com/hamba/logger/v2"
+	lctx "github.com/hamba/logger/v2/ctx"
+	"github.com/hamba/pkg/v2/http/healthz"
+	"github.com/hamba/pkg/v2/http/middleware"
+	"github.com/hamba/statter/v2"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -42,7 +50,6 @@ func WithH2C() SrvOptFunc {
 		h2s := &http2.Server{
 			IdleTimeout: 120 * time.Second,
 		}
-
 		srv.Handler = h2c.NewHandler(srv.Handler, h2s)
 	}
 }
@@ -53,7 +60,7 @@ type Server struct {
 	srv *http.Server
 }
 
-// NewServer returns a server.
+// NewServer returns a server with the base context ctx.
 func NewServer(ctx context.Context, addr string, h http.Handler, opts ...SrvOptFunc) *Server {
 	srv := &http.Server{
 		BaseContext: func(_ net.Listener) context.Context {
@@ -96,4 +103,159 @@ func (s *Server) Shutdown(timeout time.Duration) error {
 // Close closes the server.
 func (s *Server) Close() error {
 	return s.srv.Close()
+}
+
+// HealthServerConfig configures a HealthServer.
+type HealthServerConfig struct {
+	Addr    string
+	Handler http.Handler
+	Stats   *statter.Statter
+	Log     *logger.Logger
+}
+
+// HealthServer is an HTTP server with healthz capabilities.
+type HealthServer struct {
+	srv *Server
+
+	shudownCh chan struct{}
+
+	readyzMu        sync.Mutex
+	readyzInstalled bool
+	readyzChecks    []healthz.HealthChecker
+
+	livezMu        sync.Mutex
+	livezInstalled bool
+	livezChecks    []healthz.HealthChecker
+
+	stats *statter.Statter
+	log   *logger.Logger
+}
+
+// NewHealthServer returns an HTTP server with healthz capabilities.
+func NewHealthServer(ctx context.Context, cfg HealthServerConfig, opts ...SrvOptFunc) *HealthServer {
+	srv := NewServer(ctx, cfg.Addr, cfg.Handler, opts...)
+
+	return &HealthServer{
+		srv:       srv,
+		shudownCh: make(chan struct{}),
+		stats:     cfg.Stats,
+		log:       cfg.Log,
+	}
+}
+
+// AddHealthzChecks adds health checks to both readyz and livez.
+func (s *HealthServer) AddHealthzChecks(checks ...healthz.HealthChecker) error {
+	if err := s.AddReadyzChecks(checks...); err != nil {
+		return err
+	}
+	return s.AddLivezChecks(checks...)
+}
+
+// AddReadyzChecks adds health checks to readyz.
+func (s *HealthServer) AddReadyzChecks(checks ...healthz.HealthChecker) error {
+	s.readyzMu.Lock()
+	defer s.readyzMu.Unlock()
+	if s.readyzInstalled {
+		return errors.New("could not add checks as readyz has already been installed")
+	}
+	s.readyzChecks = append(s.readyzChecks, checks...)
+	return nil
+}
+
+// AddLivezChecks adds health checks to livez.
+func (s *HealthServer) AddLivezChecks(checks ...healthz.HealthChecker) error {
+	s.livezMu.Lock()
+	defer s.livezMu.Unlock()
+	if s.livezInstalled {
+		return errors.New("could not add checks as livez has already been installed")
+	}
+	s.livezChecks = append(s.livezChecks, checks...)
+	return nil
+}
+
+// Serve installs the health checks and starts the server in a non-blocking way.
+func (s *HealthServer) Serve(errFn func(error)) {
+	s.installChecks()
+
+	s.srv.Serve(errFn)
+}
+
+func (s *HealthServer) installChecks() {
+	mux := http.NewServeMux()
+	s.installLivezChecks(mux)
+
+	// When shutdown is started, the readyz check should start failing.
+	if err := s.AddReadyzChecks(shutdownCheck{ch: s.shudownCh}); err != nil {
+		s.log.Error("Could not install readyz shutdown check", lctx.Err(err))
+	}
+	s.installReadyzChecks(mux)
+
+	mux.Handle("/", s.srv.srv.Handler)
+	s.srv.srv.Handler = mux
+}
+
+func (s *HealthServer) installReadyzChecks(mux *http.ServeMux) {
+	s.readyzMu.Lock()
+	defer s.readyzMu.Unlock()
+	s.readyzInstalled = true
+	s.installCheckers(mux, "/readyz", s.readyzChecks)
+}
+
+func (s *HealthServer) installLivezChecks(mux *http.ServeMux) {
+	s.livezMu.Lock()
+	defer s.livezMu.Unlock()
+	s.livezInstalled = true
+	s.installCheckers(mux, "/livez", s.livezChecks)
+}
+
+func (s *HealthServer) installCheckers(mux *http.ServeMux, path string, checks []healthz.HealthChecker) {
+	if len(checks) == 0 {
+		checks = []healthz.HealthChecker{healthz.PingHealth}
+	}
+
+	s.log.Info("Installing health checkers",
+		lctx.Str("path", path),
+		lctx.Str("checks", strings.Join(checkNames(checks), ",")),
+	)
+
+	name := strings.TrimPrefix(path, "/")
+	h := healthz.Handler(name, func(output string) {
+		s.log.Info(fmt.Sprintf("%s check failed\n%s", name, output))
+	}, checks...)
+	mux.Handle(path, middleware.WithStats(name, s.stats, h))
+}
+
+// Shutdown attempts to close all server connections.
+func (s *HealthServer) Shutdown(timeout time.Duration) error {
+	close(s.shudownCh)
+
+	return s.srv.Shutdown(timeout)
+}
+
+// Close closes the server.
+func (s *HealthServer) Close() error {
+	return s.srv.Close()
+}
+
+func checkNames(checks []healthz.HealthChecker) []string {
+	names := make([]string, len(checks))
+	for i, check := range checks {
+		names[i] = check.Name()
+	}
+	return names
+}
+
+type shutdownCheck struct {
+	ch <-chan struct{}
+}
+
+func (s shutdownCheck) Name() string { return "shutdown" }
+
+func (s shutdownCheck) Check(*http.Request) error {
+	select {
+	case <-s.ch:
+		return errors.New("server is shutting down")
+	default:
+		return nil
+	}
 }
