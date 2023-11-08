@@ -54,6 +54,8 @@ func WithH2C() SrvOptFunc {
 	}
 }
 
+var testHookServerServe func(net.Listener)
+
 // Server is a convenience wrapper around the standard
 // library HTTP server.
 type Server struct {
@@ -63,7 +65,10 @@ type Server struct {
 // NewServer returns a server with the base context ctx.
 func NewServer(ctx context.Context, addr string, h http.Handler, opts ...SrvOptFunc) *Server {
 	srv := &http.Server{
-		BaseContext: func(_ net.Listener) context.Context {
+		BaseContext: func(ln net.Listener) context.Context {
+			if testHookServerServe != nil {
+				testHookServerServe(ln)
+			}
 			return ctx
 		},
 		Addr:              addr,
@@ -86,6 +91,13 @@ func NewServer(ctx context.Context, addr string, h http.Handler, opts ...SrvOptF
 // Serve starts the server in a non-blocking way.
 func (s *Server) Serve(errFn func(error)) {
 	go func() {
+		if s.srv.TLSConfig != nil {
+			if err := s.srv.ListenAndServeTLS("", ""); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				errFn(err)
+			}
+			return
+		}
+
 		if err := s.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errFn(err)
 		}
