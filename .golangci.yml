@@ -33,6 +33,7 @@ linters:
     - gochecknoinits
     - goerr113
     - gomnd
+    - inamedparam
     - ireturn
     - nlreturn
     - varnamelen

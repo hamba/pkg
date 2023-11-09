@@ -14,5 +14,5 @@ A collection of Go packages
 Install with:
 
 ```shell
-go get github.com/hamba/pkg
+go get github.com/hamba/pkg/v2
 ```
