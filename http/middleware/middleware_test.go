@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"sort"
 	"testing"
 	"time"
 
@@ -111,7 +112,10 @@ func TestStats(t *testing.T) {
 
 			m := &mockReporter{}
 			m.On("Counter", "requests", int64(1), test.wantTags)
-			wantTags := append(test.wantTags, [][2]string{{"status-code", "305"}, {"status-group", "3xx"}}...)
+			wantTags := append(test.wantTags, [][2]string{{"code", "305"}, {"code-group", "3xx"}}...)
+			sort.Slice(wantTags, func(i, j int) bool {
+				return wantTags[i][0] < wantTags[j][0]
+			})
 			m.On("Counter", "responses", int64(1), wantTags)
 			m.On("Histogram", "response.size", wantTags).Return(func(_ float64) {})
 			m.On("Timing", "response.duration", wantTags).Return(func(_ time.Duration) {})

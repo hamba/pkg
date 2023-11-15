@@ -2,6 +2,9 @@
 package middleware
 
 import (
+	"bufio"
+	"errors"
+	"net"
 	"net/http"
 
 	"github.com/hamba/logger/v2"
@@ -63,7 +66,7 @@ func RequestID() func(http.Handler) http.Handler {
 func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 	prometheus.RegisterHistogram(s,
 		"response.size",
-		[]string{"handler", "code"},
+		[]string{"handler", "code", "code-group"},
 		[]float64{200, 500, 900, 1500, 5000, 10000},
 		"The size of a response in bytes",
 	)
@@ -83,8 +86,8 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 		h.ServeHTTP(wrap, req)
 		dur := mono.Since(start)
 
-		t = append(t, tags.StatusCode("status-group", wrap.Status()))
-		t = append(t, tags.Int("status-code", wrap.Status()))
+		t = append(t, tags.StatusCode("code-group", wrap.Status()))
+		t = append(t, tags.Int("code", wrap.Status()))
 		s.Counter("responses", t...).Inc(1)
 		s.Histogram("response.size", t...).Observe(float64(wrap.BytesWritten()))
 		s.Timing("response.duration", t...).Observe(dur)
@@ -140,6 +143,17 @@ func (rw *responseWrapper) Status() int {
 // BytesWritten returns the number of bytes written to the writer.
 func (rw *responseWrapper) BytesWritten() int64 {
 	return rw.bytes
+}
+
+// Hijack returns a hijacked connection or an error.
+//
+// This is required by some websocket libraries.
+func (rw *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := rw.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("hijacker not supported")
+	}
+	return h.Hijack()
 }
 
 // Unwrap returns the underlying response writer.
