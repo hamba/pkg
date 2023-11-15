@@ -121,8 +121,28 @@ func (s *Server) Close() error {
 type HealthServerConfig struct {
 	Addr    string
 	Handler http.Handler
-	Stats   *statter.Statter
-	Log     *logger.Logger
+
+	ReadyzChecks []healthz.HealthChecker
+	LivezChecks  []healthz.HealthChecker
+
+	Stats *statter.Statter
+	Log   *logger.Logger
+}
+
+// AddHealthzChecks adds the given checks to the config.
+func (c *HealthServerConfig) AddHealthzChecks(checks ...healthz.HealthChecker) {
+	c.AddReadyzChecks(checks...)
+	c.AddLivezChecks(checks...)
+}
+
+// AddReadyzChecks adds the given checks to the config.
+func (c *HealthServerConfig) AddReadyzChecks(checks ...healthz.HealthChecker) {
+	c.ReadyzChecks = append(c.ReadyzChecks, checks...)
+}
+
+// AddLivezChecks adds the given checks to the config.
+func (c *HealthServerConfig) AddLivezChecks(checks ...healthz.HealthChecker) {
+	c.LivezChecks = append(c.LivezChecks, checks...)
 }
 
 // HealthServer is an HTTP server with healthz capabilities.
@@ -148,10 +168,12 @@ func NewHealthServer(ctx context.Context, cfg HealthServerConfig, opts ...SrvOpt
 	srv := NewServer(ctx, cfg.Addr, cfg.Handler, opts...)
 
 	return &HealthServer{
-		srv:       srv,
-		shudownCh: make(chan struct{}),
-		stats:     cfg.Stats,
-		log:       cfg.Log,
+		srv:          srv,
+		shudownCh:    make(chan struct{}),
+		readyzChecks: cfg.ReadyzChecks,
+		livezChecks:  cfg.LivezChecks,
+		stats:        cfg.Stats,
+		log:          cfg.Log,
 	}
 }
 
