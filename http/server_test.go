@@ -196,6 +196,55 @@ func TestHealthServer(t *testing.T) {
 	assert.Equal(t, "+ test ok\nlivez check passed", body)
 }
 
+func TestHealthServer_WithPreChecks(t *testing.T) {
+	stats := statter.New(statter.DiscardReporter, time.Minute)
+	log := logger.New(io.Discard, logger.LogfmtFormat(), logger.Error)
+
+	lnCh := make(chan net.Listener, 1)
+	setTestHookServerServe(func(ln net.Listener) {
+		lnCh <- ln
+	})
+	t.Cleanup(func() { setTestHookServerServe(nil) })
+
+	check := healthz.NamedCheck("test", func(*http.Request) error {
+		return nil
+	})
+
+	cfg := &HealthServerConfig{
+		Addr:    "localhost:0",
+		Handler: http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}),
+
+		Stats: stats,
+		Log:   log,
+	}
+	cfg.AddHealthzChecks(check)
+
+	srv := NewHealthServer(context.Background(), *cfg)
+	srv.Serve(func(err error) {
+		require.NoError(t, err)
+	})
+	t.Cleanup(func() {
+		_ = srv.Close()
+	})
+
+	var ln net.Listener
+	select {
+	case <-time.After(30 * time.Second):
+		require.Fail(t, "Timed out waiting for server listener")
+	case ln = <-lnCh:
+	}
+
+	url := "http://" + ln.Addr().String() + "/readyz?verbose=1"
+	statusCode, body := requireDoRequest(t, url)
+	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, "+ test ok\n+ shutdown ok\nreadyz check passed", body)
+
+	url = "http://" + ln.Addr().String() + "/livez?verbose=1"
+	statusCode, body = requireDoRequest(t, url)
+	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, "+ test ok\nlivez check passed", body)
+}
+
 func TestHealthServer_ShutdownCausesReadyzCheckToFail(t *testing.T) {
 	stats := statter.New(statter.DiscardReporter, time.Minute)
 	log := logger.New(io.Discard, logger.LogfmtFormat(), logger.Error)
