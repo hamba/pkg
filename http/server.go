@@ -148,6 +148,7 @@ func (c *HealthServerConfig) AddLivezChecks(checks ...healthz.HealthChecker) {
 // HealthServer is an HTTP server with healthz capabilities.
 type HealthServer struct {
 	srv *Server
+	mux *http.ServeMux
 
 	shudownCh chan struct{}
 
@@ -165,10 +166,15 @@ type HealthServer struct {
 
 // NewHealthServer returns an HTTP server with healthz capabilities.
 func NewHealthServer(ctx context.Context, cfg HealthServerConfig, opts ...SrvOptFunc) *HealthServer {
-	srv := NewServer(ctx, cfg.Addr, cfg.Handler, opts...)
+	// Setup the mux early so H2C can attach properly.
+	mux := http.NewServeMux()
+	mux.Handle("/", cfg.Handler)
+
+	srv := NewServer(ctx, cfg.Addr, mux, opts...)
 
 	return &HealthServer{
 		srv:          srv,
+		mux:          mux,
 		shudownCh:    make(chan struct{}),
 		readyzChecks: cfg.ReadyzChecks,
 		livezChecks:  cfg.LivezChecks,
@@ -215,17 +221,13 @@ func (s *HealthServer) Serve(errFn func(error)) {
 }
 
 func (s *HealthServer) installChecks() {
-	mux := http.NewServeMux()
-	s.installLivezChecks(mux)
+	s.installLivezChecks(s.mux)
 
 	// When shutdown is started, the readyz check should start failing.
 	if err := s.AddReadyzChecks(shutdownCheck{ch: s.shudownCh}); err != nil {
 		s.log.Error("Could not install readyz shutdown check", lctx.Err(err))
 	}
-	s.installReadyzChecks(mux)
-
-	mux.Handle("/", s.srv.srv.Handler)
-	s.srv.srv.Handler = mux
+	s.installReadyzChecks(s.mux)
 }
 
 func (s *HealthServer) installReadyzChecks(mux *http.ServeMux) {
