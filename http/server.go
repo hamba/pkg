@@ -165,6 +165,8 @@ type HealthServer struct {
 }
 
 // NewHealthServer returns an HTTP server with healthz capabilities.
+//
+// Deprecated: Use `server.GenericServer` instead.
 func NewHealthServer(ctx context.Context, cfg HealthServerConfig, opts ...SrvOptFunc) *HealthServer {
 	// Setup the mux early so H2C can attach properly.
 	mux := http.NewServeMux()
