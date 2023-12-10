@@ -18,17 +18,16 @@ func TestPollUntil(t *testing.T) {
 	go func() {
 		defer close(called)
 
-		err := wait.PollUntil(ctx, func(context.Context) (done bool, err error) {
+		err := wait.PollImmediateUntil(ctx, func(context.Context) (done bool, err error) {
 			called <- struct{}{}
 			return false, nil
-		}, time.Microsecond)
+		}, 100*time.Microsecond)
 
 		assert.ErrorIs(t, err, context.Canceled)
 	}()
 
-	// Wait for the initial condition call, and the first tick
+	// Wait for the first tick
 	// condition call.
-	<-called
 	<-called
 
 	// Stop waiting.
@@ -75,22 +74,54 @@ func TestPollUntil_HandlesDone(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestPollUntil_HandlesImmediateError(t *testing.T) {
+func TestPollImmediateUntil(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	called := make(chan struct{})
+	go func() {
+		defer close(called)
+
+		err := wait.PollImmediateUntil(ctx, func(context.Context) (done bool, err error) {
+			called <- struct{}{}
+			return false, nil
+		}, 100*time.Microsecond)
+
+		assert.ErrorIs(t, err, context.Canceled)
+	}()
+
+	// Wait for the initial condition call, and the first tick
+	// condition call.
+	<-called
+	<-called
+
+	// Stop waiting.
+	cancel()
+
+	// Assert that the condition is not called more than once after
+	// canceling the context.
+	var calledCount int
+	for range called {
+		calledCount++
+	}
+	assert.LessOrEqual(t, calledCount, 1)
+}
+
+func TestPollImmediateUntil_HandlesImmediateError(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err := wait.PollUntil(ctx, func(context.Context) (done bool, err error) {
+	err := wait.PollImmediateUntil(ctx, func(context.Context) (done bool, err error) {
 		return false, errors.New("test")
 	}, time.Microsecond)
 
 	require.Error(t, err)
 }
 
-func TestPollUntil_HandlesImmediateDone(t *testing.T) {
+func TestPollImmediateUntil_HandlesImmediateDone(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err := wait.PollUntil(ctx, func(context.Context) (done bool, err error) {
+	err := wait.PollImmediateUntil(ctx, func(context.Context) (done bool, err error) {
 		return true, nil
 	}, time.Microsecond)
 
