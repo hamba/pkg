@@ -9,8 +9,8 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/segmentio/ksuid v1.0.4
 	github.com/stretchr/testify v1.8.4
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.47.0
-	golang.org/x/net v0.20.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.48.0
+	golang.org/x/net v0.21.0
 )
 
 require (
@@ -34,7 +34,7 @@ require (
 	go.opentelemetry.io/otel v1.23.1 // indirect
 	go.opentelemetry.io/otel/metric v1.23.1 // indirect
 	go.opentelemetry.io/otel/trace v1.23.1 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
