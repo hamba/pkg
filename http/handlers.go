@@ -29,7 +29,7 @@ type Health interface {
 //
 // Deprecated: Use healthz instead.
 func NewHealthHandler(v ...Health) http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
+	return func(rw http.ResponseWriter, _ *http.Request) {
 		for _, h := range v {
 			if err := h.IsHealthy(); err != nil {
 				http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
