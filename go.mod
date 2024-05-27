@@ -3,13 +3,13 @@ module github.com/hamba/pkg/v2
 go 1.21
 
 require (
-	github.com/hamba/logger/v2 v2.5.1
+	github.com/hamba/logger/v2 v2.6.0
 	github.com/hamba/statter/v2 v2.3.5
 	github.com/hamba/timex v1.2.0
 	github.com/json-iterator/go v1.1.12
 	github.com/segmentio/ksuid v1.0.4
 	github.com/stretchr/testify v1.9.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.51.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0
 	golang.org/x/net v0.25.0
 )
 
@@ -31,9 +31,9 @@ require (
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/valyala/fastrand v1.1.0 // indirect
-	go.opentelemetry.io/otel v1.26.0 // indirect
-	go.opentelemetry.io/otel/metric v1.26.0 // indirect
-	go.opentelemetry.io/otel/trace v1.26.0 // indirect
+	go.opentelemetry.io/otel v1.27.0 // indirect
+	go.opentelemetry.io/otel/metric v1.27.0 // indirect
+	go.opentelemetry.io/otel/trace v1.27.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
