@@ -1,4 +1,4 @@
-// Package reason handles error reasons to separate internal from user errors.
+// Package reason contains types and functions commonly used to handle reason detection and extraction.
 package reason
 
 import (
