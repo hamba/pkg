@@ -21,8 +21,6 @@ github.com/hamba/logger/v2 v2.8.0 h1:0JJnEhVW4sHGn4/9fPP0LsZXD2ytG+NrnrXCdM8/vmg
 github.com/hamba/logger/v2 v2.8.0/go.mod h1:V58KZPAmDEWi14dOZjbKDPFkdyvpGwxXtLzLkVTNBic=
 github.com/hamba/statter/v2 v2.6.0 h1:d64DL4p48xAW4M876jrtguuEFXFf6cDFJR0WxNCDKVI=
 github.com/hamba/statter/v2 v2.6.0/go.mod h1:5QpB06ilNfJNfXW5YYe4cHUlh1NGTjIlpKDv/nl7U8w=
-github.com/hamba/timex v1.2.0 h1:Q1SMJz38jg0y+De/5D/owwqaTOMlU1vAwYGn70n1ahs=
-github.com/hamba/timex v1.2.0/go.mod h1:dCLYOsXXo4mRHEEnkzZjGArTvK29prYcuKW/1QoVhAA=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
 github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHmT4TnhNGBo=
 github.com/klauspost/compress v1.17.11 h1:In6xLpyWOi1+C7tXUUWv2ot1QvBjxevKAaI6IXrJmUc=
