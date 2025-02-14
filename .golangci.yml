@@ -14,7 +14,7 @@ linters-settings:
 linters:
   enable-all: true
   disable:
-    - exportloopref # deprecated
+    - tenv # deprecated
     - contextcheck
     - depguard
     - err113
