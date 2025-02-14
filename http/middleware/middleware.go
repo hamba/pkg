@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/hamba/logger/v2"
 	"github.com/hamba/logger/v2/ctx"
@@ -13,7 +14,6 @@ import (
 	"github.com/hamba/statter/v2"
 	"github.com/hamba/statter/v2/reporter/prometheus"
 	"github.com/hamba/statter/v2/tags"
-	"github.com/hamba/timex/mono"
 	"github.com/segmentio/ksuid"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
@@ -82,9 +82,9 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 
 		wrap := newResponseWrapper(rw)
 
-		start := mono.Now()
+		start := time.Now()
 		h.ServeHTTP(wrap, req)
-		dur := mono.Since(start)
+		dur := time.Since(start)
 
 		t = append(t, tags.StatusCode("code-group", wrap.Status()))
 		t = append(t, tags.Int("code", wrap.Status()))
