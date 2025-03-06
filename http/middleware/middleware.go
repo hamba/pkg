@@ -72,11 +72,12 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 	)
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		t := make([]statter.Tag, 1, 3)
+		t := make([]statter.Tag, 2, 4)
 		if name == "" {
 			name = req.URL.Path
 		}
 		t[0] = tags.Str("handler", name)
+		t[1] = tags.Str("method", req.Method)
 
 		s.Counter("requests", t...).Inc(1)
 
