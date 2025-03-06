@@ -72,7 +72,7 @@ func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 	)
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		t := make([]statter.Tag, 2, 5)
+		t := make([]statter.Tag, 2, 4)
 		if name == "" {
 			name = req.URL.Path
 		}
