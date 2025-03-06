@@ -96,12 +96,12 @@ func TestStats(t *testing.T) {
 			name:        "with handler name",
 			handlerName: "my-handler",
 			path:        "/test",
-			wantTags:    [][2]string{{"handler", "my-handler"}},
+			wantTags:    [][2]string{{"handler", "my-handler"}, {"method", "GET"}},
 		},
 		{
 			name:     "without handler name",
 			path:     "/test",
-			wantTags: [][2]string{{"handler", "/test"}},
+			wantTags: [][2]string{{"handler", "/test"}, {"method", "GET"}},
 		},
 	}
 
