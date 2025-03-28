@@ -1,20 +1,22 @@
+version: "2"
 run:
   tests: false
-  timeout: 5m
 
-linters-settings:
-  cyclop:
-    max-complexity: 12
-    skip-tests: true
-  funlen:
-    lines: 80
-  gofumpt:
-    extra-rules: true
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gofumpt:
+      extra-rules: true
+  exclusions:
+    generated: lax
 
 linters:
-  enable-all: true
+  default: all
   disable:
-    - tenv # deprecated
     - contextcheck
     - depguard
     - err113
@@ -31,6 +33,10 @@ linters:
     - varnamelen
     - wrapcheck
     - wsl
-
-issues:
-  exclude-use-default: false
+  settings:
+    cyclop:
+      max-complexity: 12
+    funlen:
+      lines: 80
+  exclusions:
+    generated: lax
