@@ -2,6 +2,8 @@ module github.com/hamba/pkg/v2
 
 go 1.23.0
 
+toolchain go1.24.1
+
 require (
 	github.com/hamba/logger/v2 v2.8.0
 	github.com/hamba/statter/v2 v2.6.0
@@ -9,7 +11,7 @@ require (
 	github.com/segmentio/ksuid v1.0.4
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 )
 
 require (
