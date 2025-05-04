@@ -1,6 +1,4 @@
 version: "2"
-run:
-  tests: false
 
 formatters:
   enable:
@@ -35,14 +33,22 @@ linters:
     - inamedparam
     - ireturn
     - mnd
+    - nonamedreturns
     - nlreturn
+    - paralleltest
+    - testpackage
     - varnamelen
     - wrapcheck
     - wsl
   settings:
     cyclop:
-      max-complexity: 12
+      max-complexity: 15
     funlen:
-      lines: 80
+      lines: 160
   exclusions:
     generated: lax
+    rules:
+      - linters:
+          - gosec
+          - lll
+        path: _test\.go

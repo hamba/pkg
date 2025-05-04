@@ -13,11 +13,11 @@ import (
 func BenchmarkWithStats(b *testing.B) {
 	s := statter.New(statter.DiscardReporter, time.Second)
 	h := middleware.WithStats("test", s, http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {}),
+		func(http.ResponseWriter, *http.Request) {}),
 	)
 
 	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", nil)
 
 	b.ReportAllocs()
 	b.ResetTimer()

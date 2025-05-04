@@ -60,7 +60,7 @@ func TestGenericServer_Run(t *testing.T) {
 	url := "http://" + ln.Addr().String() + "/"
 	statusCode, _ := requireDoRequest(t, url)
 
-	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, statusCode)
 	assert.True(t, handlerCalled)
 
 	cancel()
@@ -123,7 +123,7 @@ func TestGenericServer_RunWithTLS(t *testing.T) {
 	url := "https://" + ln.Addr().String() + "/"
 	statusCode, _ := requireDoRequest(t, url)
 
-	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, statusCode)
 	assert.True(t, handlerCalled)
 
 	cancel()
@@ -149,7 +149,7 @@ func TestGenericServer_RunWithHooks(t *testing.T) {
 	}
 
 	postStartHookCalledCh := make(chan struct{})
-	srv.MustAddPostStartHook("test", func(t context.Context) error {
+	srv.MustAddPostStartHook("test", func(_ context.Context) error {
 		close(postStartHookCalledCh)
 		return nil
 	})
@@ -232,12 +232,12 @@ func TestGenericServer_RunWithHealthChecks(t *testing.T) {
 
 	url := "http://" + ln.Addr().String() + "/readyz?verbose=1"
 	statusCode, body := requireDoRequest(t, url)
-	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, statusCode)
 	assert.Equal(t, "+ postStartHook:test ok\n+ test ok\n+ shutdown ok\nreadyz check passed", body)
 
 	url = "http://" + ln.Addr().String() + "/livez?verbose=1"
 	statusCode, body = requireDoRequest(t, url)
-	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, statusCode)
 	assert.Equal(t, "+ test ok\nlivez check passed", body)
 
 	cancel()
@@ -298,7 +298,7 @@ func TestGenericServer_RunShutdownCausesReadyzToFail(t *testing.T) {
 
 	url := "http://" + ln.Addr().String() + "/readyz?verbose=1"
 	statusCode, body := requireDoRequest(t, url)
-	assert.Equal(t, statusCode, http.StatusInternalServerError)
+	assert.Equal(t, http.StatusInternalServerError, statusCode)
 	assert.Equal(t, "+ test ok\n- shutdown failed\nreadyz check failed\n", body)
 
 	select {
@@ -330,7 +330,7 @@ func TestGenericServer_RunHandlesServerError(t *testing.T) {
 
 	err = srv.Run(ctx)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "starting server: listen tcp 127.0.0.1:")
 	assert.Contains(t, err.Error(), "bind: address already in use")
 }
@@ -393,7 +393,10 @@ func requireDoRequest(t *testing.T, path string) (int, string) {
 		},
 	}
 
-	req, err := http.NewRequest(http.MethodGet, path, nil)
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, path, nil)
 	require.NoError(t, err)
 
 	resp, err := client.Do(req)

@@ -24,7 +24,7 @@ func TestHandler(t *testing.T) {
 	h.ServeHTTP(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
-	assert.Equal(t, "", gotOutput)
+	assert.Empty(t, gotOutput)
 	assert.Equal(t, `ok`, rec.Body.String())
 }
 
@@ -42,7 +42,7 @@ func TestHandler_Verbose(t *testing.T) {
 	h.ServeHTTP(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
-	assert.Equal(t, "", gotOutput)
+	assert.Empty(t, gotOutput)
 	assert.Equal(t, "+ good ok\nreadyz check passed", rec.Body.String())
 }
 
