@@ -46,7 +46,8 @@ func TestRealIP(t *testing.T) {
 				RemoteAddr: "127.0.0.1",
 				Header: http.Header{
 					http.CanonicalHeaderKey("X-Forwarded-For"): []string{"1.2.3.4", "11.0.0.1"},
-					http.CanonicalHeaderKey("X-Real-Ip"):       []string{"5.6.7.8"}},
+					http.CanonicalHeaderKey("X-Real-Ip"):       []string{"5.6.7.8"},
+				},
 			},
 			want: "1.2.3.4",
 		},

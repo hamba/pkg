@@ -27,6 +27,7 @@ func TestHandler(t *testing.T) {
 	assert.Equal(t, "", gotOutput)
 	assert.Equal(t, `ok`, rec.Body.String())
 }
+
 func TestHandler_Verbose(t *testing.T) {
 	goodCheck := healthz.NamedCheck("good", func(*http.Request) error { return nil })
 
