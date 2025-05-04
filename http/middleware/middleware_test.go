@@ -2,6 +2,7 @@ package middleware_test
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -20,6 +21,8 @@ import (
 )
 
 func TestRecovery(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		val     interface{}
@@ -38,18 +41,20 @@ func TestRecovery(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
 			buf := bytes.Buffer{}
 			log := logger.New(&buf, logger.LogfmtFormat(), logger.Info)
 
-			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			next := http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
 				panic(test.val)
 			})
 
-			req, _ := http.NewRequest("GET", "/", nil)
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
+
+			req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
 			resp := httptest.NewRecorder()
 
 			defer func() {
@@ -66,8 +71,10 @@ func TestRecovery(t *testing.T) {
 }
 
 func TestRequestID(t *testing.T) {
+	t.Parallel()
+
 	var nextCalled bool
-	next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	next := http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
 		nextCalled = true
 
 		got, ok := request.IDFrom(req.Context())
@@ -76,7 +83,10 @@ func TestRequestID(t *testing.T) {
 		assert.NotEmpty(t, got)
 	})
 
-	req := httptest.NewRequest(http.MethodGet, "/some/thing", nil)
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/some/thing", nil)
 	rec := httptest.NewRecorder()
 
 	middleware.RequestID()(next).ServeHTTP(rec, req)
@@ -86,6 +96,8 @@ func TestRequestID(t *testing.T) {
 }
 
 func TestStats(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name        string
 		handlerName string
@@ -106,13 +118,12 @@ func TestStats(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
 			m := &mockReporter{}
 			m.On("Counter", "requests", int64(1), test.wantTags)
-			wantTags := append(test.wantTags, [][2]string{{"code", "305"}, {"code-group", "3xx"}}...)
+			wantTags := append(test.wantTags, [][2]string{{"code", "305"}, {"code-group", "3xx"}}...) //nolint:gocritic
 			sort.Slice(wantTags, func(i, j int) bool {
 				return wantTags[i][0] < wantTags[j][0]
 			})
@@ -123,12 +134,15 @@ func TestStats(t *testing.T) {
 			s := statter.New(m, time.Second)
 
 			next := http.HandlerFunc(
-				func(w http.ResponseWriter, r *http.Request) {
-					w.WriteHeader(305)
+				func(w http.ResponseWriter, _ *http.Request) {
+					w.WriteHeader(http.StatusUseProxy)
 				})
 
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
+
+			req, _ := http.NewRequestWithContext(ctx, http.MethodGet, test.path, nil)
 			resp := httptest.NewRecorder()
-			req, _ := http.NewRequest("GET", test.path, nil)
 
 			middleware.Stats(test.handlerName, s)(next).ServeHTTP(resp, req)
 
@@ -141,17 +155,22 @@ func TestStats(t *testing.T) {
 }
 
 func TestWithStats_Prometheus(t *testing.T) {
+	t.Parallel()
+
 	reporter := prometheus.New("test")
 	s := statter.New(reporter, time.Second)
 
 	h := middleware.WithStats("test-handler", s, http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(305)
+		func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusUseProxy)
 		}),
 	)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "/foobar", nil)
 	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/foobar", nil)
 
 	h.ServeHTTP(resp, req)
 

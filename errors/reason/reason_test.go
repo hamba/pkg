@@ -19,7 +19,7 @@ func TestExtract(t *testing.T) {
 
 	reasons, errs := reason.Extract(errs)
 
-	require.NotEmpty(t, errs)
+	require.Error(t, errs)
 	assert.Equal(t, "test1\ntest2", errs.Error())
 	assert.Equal(t, []string{"First Error", "Second Error"}, reasons)
 }

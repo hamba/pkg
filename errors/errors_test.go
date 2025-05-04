@@ -1,18 +1,18 @@
 package errors_test
 
 import (
-	"errors"
 	"testing"
 
 	errorsx "github.com/hamba/pkg/v2/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-const testErr = errorsx.Error("test error")
+const errTest = errorsx.Error("test error")
 
 func TestError(t *testing.T) {
-	err := testErr
+	err := errTest
 
-	assert.EqualError(t, err, "test error")
-	assert.True(t, errors.Is(err, testErr))
+	require.EqualError(t, err, "test error")
+	assert.ErrorIs(t, err, errTest)
 }

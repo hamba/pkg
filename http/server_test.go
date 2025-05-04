@@ -42,12 +42,12 @@ func TestServer(t *testing.T) {
 	}
 
 	url := "http://" + ln.Addr().String() + "/"
-	statusCode, _ := requireDoRequest(t, url)
+	statusCode := requireDoRequest(t, url)
 
 	err := srv.Shutdown(time.Second)
 	require.NoError(t, err)
 
-	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, statusCode)
 	assert.True(t, handlerCalled)
 }
 
@@ -85,12 +85,12 @@ func TestServer_WithTLSConfig(t *testing.T) {
 	}
 
 	url := "https://" + ln.Addr().String() + "/"
-	statusCode, _ := requireDoRequest(t, url)
+	statusCode := requireDoRequest(t, url)
 
 	err = srv.Shutdown(time.Second)
 	require.NoError(t, err)
 
-	assert.Equal(t, statusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, statusCode)
 	assert.True(t, handlerCalled)
 }
 
@@ -126,13 +126,21 @@ func TestServer_WithH2C(t *testing.T) {
 	c := &http.Client{
 		Transport: &http2.Transport{
 			AllowHTTP: true,
-			DialTLSContext: func(_ context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
+			DialTLSContext: func(_ context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
 				return net.Dial(network, addr)
 			},
 		},
 	}
-	res, err := c.Get("http://" + ln.Addr().String() + "/")
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+ln.Addr().String()+"/", nil)
 	require.NoError(t, err)
+
+	res, err := c.Do(req)
+	require.NoError(t, err)
+
 	t.Cleanup(func() {
 		_, _ = io.Copy(io.Discard, res.Body)
 		_ = res.Body.Close()
@@ -141,11 +149,11 @@ func TestServer_WithH2C(t *testing.T) {
 	err = srv.Shutdown(time.Second)
 	require.NoError(t, err)
 
-	assert.Equal(t, res.StatusCode, http.StatusOK)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.True(t, handlerCalled)
 }
 
-func requireDoRequest(t *testing.T, path string) (int, string) {
+func requireDoRequest(t *testing.T, path string) int {
 	t.Helper()
 
 	client := &http.Client{
@@ -156,7 +164,10 @@ func requireDoRequest(t *testing.T, path string) (int, string) {
 		},
 	}
 
-	req, err := http.NewRequest(http.MethodGet, path, nil)
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, path, nil)
 	require.NoError(t, err)
 
 	resp, err := client.Do(req)
@@ -166,10 +177,7 @@ func requireDoRequest(t *testing.T, path string) (int, string) {
 		_ = resp.Body.Close()
 	}()
 
-	b, err := io.ReadAll(resp.Body)
-	require.NoError(t, err)
-
-	return resp.StatusCode, string(b)
+	return resp.StatusCode
 }
 
 func setTestHookServerServe(fn func(net.Listener)) {
