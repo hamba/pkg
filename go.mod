@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/hamba/logger/v2 v2.8.0
-	github.com/hamba/statter/v2 v2.6.1
+	github.com/hamba/statter/v2 v2.7.0
 	github.com/json-iterator/go v1.1.12
 	github.com/segmentio/ksuid v1.0.4
 	github.com/stretchr/testify v1.10.0
