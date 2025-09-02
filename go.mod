@@ -9,8 +9,8 @@ require (
 	github.com/hamba/statter/v2 v2.7.0
 	github.com/json-iterator/go v1.1.12
 	github.com/segmentio/ksuid v1.0.4
-	github.com/stretchr/testify v1.11.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0
+	github.com/stretchr/testify v1.11.1
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
 	golang.org/x/net v0.43.0
 )
 
@@ -33,9 +33,9 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/valyala/fastrand v1.1.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.opentelemetry.io/otel v1.37.0 // indirect
-	go.opentelemetry.io/otel/metric v1.37.0 // indirect
-	go.opentelemetry.io/otel/trace v1.37.0 // indirect
+	go.opentelemetry.io/otel v1.38.0 // indirect
+	go.opentelemetry.io/otel/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
