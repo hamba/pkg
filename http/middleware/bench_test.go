@@ -17,7 +17,7 @@ func BenchmarkWithStats(b *testing.B) {
 	)
 
 	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequestWithContext(b.Context(), http.MethodGet, "/", nil)
 
 	b.ReportAllocs()
 	b.ResetTimer()

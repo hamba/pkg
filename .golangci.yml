@@ -33,6 +33,7 @@ linters:
     - inamedparam
     - ireturn
     - mnd
+    - noinlineerr
     - nonamedreturns
     - nlreturn
     - paralleltest
@@ -40,6 +41,7 @@ linters:
     - varnamelen
     - wrapcheck
     - wsl
+    - wsl_v5
   settings:
     cyclop:
       max-complexity: 15
