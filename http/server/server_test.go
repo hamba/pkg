@@ -312,7 +312,8 @@ func TestGenericServer_RunHandlesServerError(t *testing.T) {
 	stats := statter.New(statter.DiscardReporter, 10*time.Second)
 	log := logger.New(io.Discard, logger.LogfmtFormat(), logger.Error)
 
-	ln, err := net.Listen("tcp", "localhost:0")
+	var lnCfg net.ListenConfig
+	ln, err := lnCfg.Listen(t.Context(), "tcp", "localhost:0")
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = ln.Close() })
 

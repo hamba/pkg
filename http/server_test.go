@@ -126,8 +126,9 @@ func TestServer_WithH2C(t *testing.T) {
 	c := &http.Client{
 		Transport: &http2.Transport{
 			AllowHTTP: true,
-			DialTLSContext: func(_ context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
-				return net.Dial(network, addr)
+			DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
+				var d net.Dialer
+				return d.DialContext(ctx, network, addr)
 			},
 		},
 	}
