@@ -43,8 +43,7 @@ func TestPollUntil(t *testing.T) {
 }
 
 func TestPollUntil_HandlesError(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	var count int
 	err := wait.PollUntil(ctx, func(context.Context) (done bool, err error) {
@@ -59,8 +58,7 @@ func TestPollUntil_HandlesError(t *testing.T) {
 }
 
 func TestPollUntil_HandlesDone(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	var count int
 	err := wait.PollUntil(ctx, func(context.Context) (done bool, err error) {
@@ -107,8 +105,7 @@ func TestPollImmediateUntil(t *testing.T) {
 }
 
 func TestPollImmediateUntil_HandlesImmediateError(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	err := wait.PollImmediateUntil(ctx, func(context.Context) (done bool, err error) {
 		return false, errors.New("test")
@@ -118,8 +115,7 @@ func TestPollImmediateUntil_HandlesImmediateError(t *testing.T) {
 }
 
 func TestPollImmediateUntil_HandlesImmediateDone(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	err := wait.PollImmediateUntil(ctx, func(context.Context) (done bool, err error) {
 		return true, nil

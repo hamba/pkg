@@ -47,6 +47,14 @@ linters:
       max-complexity: 15
     funlen:
       lines: 160
+    revive:
+      rules:
+        - name: var-naming
+          arguments:
+            - []
+            - []
+            - - skip-package-name-checks: true
+                skip-package-name-collision-with-go-std: true
   exclusions:
     generated: lax
     rules:
