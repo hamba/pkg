@@ -38,10 +38,8 @@ func Extract(err error) ([]string, error) {
 	//nolint:errorlint // This is the only way to check for the interface.
 	switch x := err.(type) {
 	case interface{ Unwrap() []error }:
-		var (
-			reasons []string
-			errs    []error
-		)
+		reasons := make([]string, 0, len(x.Unwrap()))
+		var errs []error
 		for _, err = range x.Unwrap() {
 			r, e := Extract(err)
 			reasons = append(reasons, r...)

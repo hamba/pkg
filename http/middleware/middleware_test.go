@@ -25,7 +25,7 @@ func TestRecovery(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		val     interface{}
+		val     any
 		wantLog string
 	}{
 		{
