@@ -159,7 +159,7 @@ func (s *GenericServer[T]) runServer(
 	}
 
 	serverShutdownCh := make(chan struct{})
-	go func() {
+	go func() { //nolint:gosec // This must use a new context, so shutdown can complete properly.
 		defer close(serverShutdownCh)
 
 		<-doneCh

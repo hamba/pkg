@@ -83,10 +83,7 @@ func TestRequestID(t *testing.T) {
 		assert.NotEmpty(t, got)
 	})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	req := httptest.NewRequestWithContext(ctx, http.MethodGet, "/some/thing", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/some/thing", nil)
 	rec := httptest.NewRecorder()
 
 	middleware.RequestID()(next).ServeHTTP(rec, req)
