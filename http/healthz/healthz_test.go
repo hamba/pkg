@@ -18,7 +18,7 @@ func TestHandler(t *testing.T) {
 		gotOutput = output
 	}, goodCheck)
 
-	req := httptest.NewRequest(http.MethodGet, "/readyz", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/readyz", nil)
 	rec := httptest.NewRecorder()
 
 	h.ServeHTTP(rec, req)
@@ -36,7 +36,7 @@ func TestHandler_Verbose(t *testing.T) {
 		gotOutput = output
 	}, goodCheck)
 
-	req := httptest.NewRequest(http.MethodGet, "/readyz?verbose=1", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/readyz?verbose=1", nil)
 	rec := httptest.NewRecorder()
 
 	h.ServeHTTP(rec, req)
@@ -55,7 +55,7 @@ func TestHandler_WithFailingChecks(t *testing.T) {
 		gotOutput = output
 	}, goodCheck, badCheck)
 
-	req := httptest.NewRequest(http.MethodGet, "/readyz", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/readyz", nil)
 	rec := httptest.NewRecorder()
 
 	h.ServeHTTP(rec, req)
