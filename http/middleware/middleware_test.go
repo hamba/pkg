@@ -6,7 +6,6 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"sort"
 	"testing"
 	"time"
 
@@ -120,10 +119,7 @@ func TestStats(t *testing.T) {
 
 			m := &mockReporter{}
 			m.On("Counter", "requests", int64(1), test.wantTags)
-			wantTags := append(test.wantTags, [][2]string{{"code", "305"}, {"code-group", "3xx"}}...) //nolint:gocritic
-			sort.Slice(wantTags, func(i, j int) bool {
-				return wantTags[i][0] < wantTags[j][0]
-			})
+			wantTags := append(test.wantTags, [][2]string{{"code-group", "3xx"}, {"code", "305"}}...) //nolint:gocritic
 			m.On("Counter", "responses", int64(1), wantTags)
 			m.On("Histogram", "response.size", wantTags).Return(func(_ float64) {})
 			m.On("Timing", "response.duration", wantTags).Return(func(_ time.Duration) {})
