@@ -50,6 +50,9 @@ var testHookServerServe func(net.Listener)
 
 // Server is a convenience wrapper around the standard
 // library HTTP server.
+//
+// Deprecated: Use server.GenericServer instead of this type. This type is not
+// needed and will be removed in a future release.
 type Server struct {
 	srv *http.Server
 }
