@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"slices"
 	"sync"
 	"time"
 
@@ -15,8 +16,6 @@ import (
 	lctx "github.com/hamba/logger/v2/ctx"
 	"github.com/hamba/pkg/v2/http/healthz"
 	"github.com/hamba/statter/v2"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
 )
 
 var testHookServerServe func(net.Listener)
@@ -128,20 +127,25 @@ func (s *GenericServer[T]) runServer(
 	if err != nil {
 		return nil, nil, err
 	}
+	var tlsCfg *tls.Config
 	if s.TLSConfig != nil {
-		ln = tls.NewListener(ln, s.TLSConfig)
+		tlsCfg = s.TLSConfig.Clone()
+		if !slices.Contains(tlsCfg.NextProtos, "h2") {
+			tlsCfg.NextProtos = append([]string{"h2"}, tlsCfg.NextProtos...)
+		}
+		ln = tls.NewListener(ln, tlsCfg)
 	}
 
 	if testHookServerServe != nil {
 		testHookServerServe(ln)
 	}
 
-	// If there is no TLS, setup h2c.
+	protos := &http.Protocols{}
+	protos.SetHTTP1(true)
+	protos.SetHTTP2(true)
 	if s.TLSConfig == nil {
-		h2s := &http2.Server{
-			IdleTimeout: s.IdleTimeout,
-		}
-		h = h2c.NewHandler(h, h2s)
+		// If there is no TLS, setup unencrypted HTTP/2 (h2c).
+		protos.SetUnencryptedHTTP2(true)
 	}
 
 	srv := &http.Server{
@@ -150,12 +154,13 @@ func (s *GenericServer[T]) runServer(
 			return ctx
 		},
 		Handler:           h,
-		TLSConfig:         s.TLSConfig,
+		TLSConfig:         tlsCfg,
 		ReadHeaderTimeout: withDefault(s.ReadHeaderTimeout, time.Second),
 		ReadTimeout:       withDefault(s.ReadTimeout, 10*time.Second),
 		WriteTimeout:      withDefault(s.WriteTimeout, 10*time.Second),
 		IdleTimeout:       withDefault(s.IdleTimeout, 120*time.Second),
 		ErrorLog:          log.New(s.Log.Writer(logger.Error), "", 0),
+		Protocols:         protos,
 	}
 
 	serverShutdownCh := make(chan struct{})
@@ -197,7 +202,7 @@ func (s *GenericServer[T]) shutdownTimeout() time.Duration {
 func withDefault[T comparable](val, def T) T {
 	var defT T
 	if val == defT {
-		return val
+		return def
 	}
-	return def
+	return val
 }
