@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"io"
 	"net"
 	"net/http"
@@ -108,7 +109,7 @@ func TestGenericServer_RunWithTLS(t *testing.T) {
 	go func() {
 		defer close(shutdownCh)
 
-		err := srv.Run(ctx)
+		err = srv.Run(ctx)
 
 		assert.NoError(t, err)
 	}()
@@ -386,11 +387,20 @@ func TestGenericServer_RunHandlesUnexpectedListenerClose(t *testing.T) {
 func requireDoRequest(t *testing.T, path string) (int, string) {
 	t.Helper()
 
+	certPool := x509.NewCertPool()
+	ok := certPool.AppendCertsFromPEM(localhostCert)
+	require.True(t, ok, "failed to append cert to pool")
+
+	protos := &http.Protocols{}
+	protos.SetHTTP2(true)
+	protos.SetUnencryptedHTTP2(true)
+
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
+				RootCAs: certPool,
 			},
+			Protocols: protos,
 		},
 	}
 
