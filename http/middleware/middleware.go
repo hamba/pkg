@@ -66,7 +66,7 @@ func RequestID() func(http.Handler) http.Handler {
 func WithStats(name string, s *statter.Statter, h http.Handler) http.Handler {
 	prometheus.RegisterHistogram(s,
 		"response.size",
-		[]string{"handler", "code", "code-group"},
+		[]string{"handler", "method", "code", "code-group"},
 		[]float64{200, 500, 900, 1500, 5000, 10000},
 		"The size of a response in bytes",
 	)
