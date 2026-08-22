@@ -6,6 +6,8 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -120,6 +122,7 @@ func TestStats(t *testing.T) {
 			m := &mockReporter{}
 			m.On("Counter", "requests", int64(1), test.wantTags)
 			wantTags := append(test.wantTags, [][2]string{{"code-group", "3xx"}, {"code", "305"}}...) //nolint:gocritic
+			slices.SortFunc(wantTags, func(a, b [2]string) int { return strings.Compare(a[0], b[0]) })
 			m.On("Counter", "responses", int64(1), wantTags)
 			m.On("Histogram", "response.size", wantTags).Return(func(_ float64) {})
 			m.On("Timing", "response.duration", wantTags).Return(func(_ time.Duration) {})
@@ -129,7 +132,8 @@ func TestStats(t *testing.T) {
 			next := http.HandlerFunc(
 				func(w http.ResponseWriter, _ *http.Request) {
 					w.WriteHeader(http.StatusUseProxy)
-				})
+				},
+			)
 
 			ctx, cancel := context.WithCancel(context.Background())
 			t.Cleanup(cancel)
@@ -156,7 +160,8 @@ func TestWithStats_Prometheus(t *testing.T) {
 	h := middleware.WithStats("test-handler", s, http.HandlerFunc(
 		func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusUseProxy)
-		}),
+		},
+	),
 	)
 
 	ctx, cancel := context.WithCancel(context.Background())
