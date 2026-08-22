@@ -8,7 +8,10 @@ formatters:
     - goimports
   settings:
     gofumpt:
-      extra-rules: true
+      extra:
+        group-params: true
+        clothe-returns: true
+        balance-calls: true
     gci:
       sections:
         - standard
@@ -26,10 +29,12 @@ linters:
     - err113
     - exhaustive
     - exhaustruct
+    - exhaustruct_v5
     - forcetypeassert
     - funlen
     - gochecknoglobals
     - gochecknoinits
+    - gomodguard
     - inamedparam
     - ireturn
     - mnd
@@ -61,4 +66,5 @@ linters:
       - linters:
           - gosec
           - lll
+          - goconst
         path: _test\.go

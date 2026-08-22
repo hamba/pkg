@@ -59,8 +59,7 @@ func Extract(err error) ([]string, error) {
 	case interface{ Unwrap() error }:
 		return Extract(x.Unwrap())
 	default:
-		var r Error
-		if errors.As(err, &r) {
+		if r, ok := errors.AsType[Error](err); ok {
 			return []string{r.Msg}, nil
 		}
 		return nil, err
