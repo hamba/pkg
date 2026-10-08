@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"io"
 	"net"
 	"net/http"
@@ -309,6 +310,93 @@ func TestGenericServer_RunShutdownCausesReadyzToFail(t *testing.T) {
 	}
 }
 
+func TestGenericServer_RunDoesNotImmediatelyCancelHandler(t *testing.T) {
+	stats := statter.New(statter.DiscardReporter, 10*time.Second)
+	log := logger.New(io.Discard, logger.LogfmtFormat(), logger.Error)
+
+	lnCh := make(chan net.Listener, 1)
+	setTestHookServerServe(func(ln net.Listener) {
+		lnCh <- ln
+	})
+	t.Cleanup(func() { setTestHookServerServe(nil) })
+
+	startedCh := make(chan struct{})
+	proceedCh := make(chan struct{})
+	ctxErrCh := make(chan error, 1)
+	h := http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		close(startedCh)
+		<-proceedCh
+		ctxErrCh <- r.Context().Err()
+	})
+
+	srv := &GenericServer[context.Context]{
+		Addr:    "localhost:0",
+		Handler: h,
+		Stats:   stats,
+		Log:     log,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	shutdownCh := make(chan struct{})
+	go func() {
+		defer close(shutdownCh)
+
+		err := srv.Run(ctx)
+
+		assert.NoError(t, err)
+	}()
+
+	var ln net.Listener
+	select {
+	case <-time.After(30 * time.Second):
+		require.Fail(t, "Timed out waiting for server listener")
+	case ln = <-lnCh:
+	}
+
+	type result struct {
+		statusCode int
+		err        error
+	}
+	respCh := make(chan result, 1)
+	go func() {
+		statusCode, _, err := doRequest(t, "http://"+ln.Addr().String()+"/")
+		respCh <- result{statusCode: statusCode, err: err}
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		require.Fail(t, "Timed out waiting for handler to start")
+	case <-startedCh:
+	}
+
+	cancel()
+	time.Sleep(50 * time.Millisecond)
+	close(proceedCh)
+
+	select {
+	case <-time.After(30 * time.Second):
+		require.Fail(t, "Timed out waiting for handler")
+	case err := <-ctxErrCh:
+		require.NoError(t, err)
+	}
+
+	select {
+	case <-time.After(30 * time.Second):
+		require.Fail(t, "Timed out waiting for response")
+	case res := <-respCh:
+		require.NoError(t, res.err)
+		assert.Equal(t, http.StatusOK, res.statusCode)
+	}
+
+	select {
+	case <-time.After(30 * time.Second):
+		require.Fail(t, "Timed out waiting for server to shutdown")
+	case <-shutdownCh:
+	}
+}
+
 func TestGenericServer_RunHandlesServerError(t *testing.T) {
 	stats := statter.New(statter.DiscardReporter, 10*time.Second)
 	log := logger.New(io.Discard, logger.LogfmtFormat(), logger.Error)
@@ -387,9 +475,19 @@ func TestGenericServer_RunHandlesUnexpectedListenerClose(t *testing.T) {
 func requireDoRequest(t *testing.T, path string) (int, string) {
 	t.Helper()
 
+	statusCode, body, err := doRequest(t, path)
+	require.NoError(t, err)
+
+	return statusCode, body
+}
+
+func doRequest(t *testing.T, path string) (int, string, error) {
+	t.Helper()
+
 	certPool := x509.NewCertPool()
-	ok := certPool.AppendCertsFromPEM(localhostCert)
-	require.True(t, ok, "failed to append cert to pool")
+	if ok := certPool.AppendCertsFromPEM(localhostCert); !ok {
+		return 0, "", errors.New("failed to append cert to pool")
+	}
 
 	protos := &http.Protocols{}
 	protos.SetHTTP2(true)
@@ -408,19 +506,25 @@ func requireDoRequest(t *testing.T, path string) (int, string) {
 	t.Cleanup(cancel)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, path, nil)
-	require.NoError(t, err)
+	if err != nil {
+		return 0, "", err
+	}
 
 	resp, err := client.Do(req)
-	require.NoError(t, err)
+	if err != nil {
+		return 0, "", err
+	}
 	defer func() {
 		_, _ = io.Copy(io.Discard, resp.Body)
 		_ = resp.Body.Close()
 	}()
 
 	b, err := io.ReadAll(resp.Body)
-	require.NoError(t, err)
+	if err != nil {
+		return 0, "", err
+	}
 
-	return resp.StatusCode, string(b)
+	return resp.StatusCode, string(b), nil
 }
 
 func setTestHookServerServe(fn func(net.Listener)) {
