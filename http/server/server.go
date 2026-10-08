@@ -149,10 +149,7 @@ func (s *GenericServer[T]) runServer(
 	}
 
 	srv := &http.Server{
-		Addr: addr,
-		BaseContext: func(_ net.Listener) context.Context {
-			return ctx
-		},
+		Addr:              addr,
 		Handler:           h,
 		TLSConfig:         tlsCfg,
 		ReadHeaderTimeout: withDefault(s.ReadHeaderTimeout, time.Second),
