@@ -1,6 +1,6 @@
 module github.com/hamba/pkg/v2
 
-go 1.26.9
+go 1.26.10
 
 require (
 	github.com/hamba/logger/v2 v2.10.1
